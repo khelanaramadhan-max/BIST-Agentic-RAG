@@ -31,7 +31,7 @@ COPY . .
 RUN mkdir -p data/raw/kap data/raw/news data/raw/pdfs data/processed data/chromadb \
     && mkdir -p /app/.cache/huggingface
 
-EXPOSE 8000 8501
+EXPOSE 8080 8501
 
 # Railway / Render set PORT; docker-compose can keep port 8000
-CMD ["sh", "-c", "exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

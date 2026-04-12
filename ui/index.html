@@ -8,7 +8,7 @@
     <meta name="description"
         content="Agentic RAG system for Turkish equity market intelligence — KAP disclosures, financial news, and brokerage research analysis.">
     <!-- Injected at deploy time if repo secret BIST_API_BASE_URL is set; or set content="https://your-api..." manually. -->
-    <meta name="bist-api-base" content="https://bist-agentic-rag-1.onrender.com">
+    <meta name="bist-api-base" content="">
     <meta name="bist-ui-revision" content="2026-04-12-v4-live-market">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
@@ -1125,7 +1125,7 @@
             <div class="nav-actions">
                 <span class="badge badge-teal" id="market-status-badge">🇹🇷 BIST Live</span>
                 <span class="badge badge-primary">🚀 AI Powered</span>
-                <a href="http://localhost:8000/docs" target="_blank" id="api-docs-link" class="btn btn-outline"
+                <a href="http://127.0.0.1:8080/docs" target="_blank" id="api-docs-link" class="btn btn-outline"
                     style="padding:7px 14px; font-size:0.8rem;">API Docs</a>
             </div>
         </div>
@@ -1176,7 +1176,7 @@
                         💬 Ask the Agent
                     </button>
                     <a href="http://localhost:8501" target="_blank" class="btn btn-outline">🖥️ Streamlit UI</a>
-                    <a href="http://localhost:8000/docs" target="_blank" class="btn btn-outline">📚 API Docs</a>
+                    <a href="http://127.0.0.1:8080/docs" target="_blank" class="btn btn-outline">📚 API Docs</a>
                 </div>
             </div>
 
@@ -1816,7 +1816,7 @@
                 if (await probeHealth(c)) return c;
             }
             if (pageIsHttps()) return '';
-            return 'http://127.0.0.1:8000';
+            return 'http://127.0.0.1:8080';
         }
 
         function uniqueBases(list) {

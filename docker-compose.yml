@@ -6,13 +6,13 @@ services:
     build: .
     container_name: bist-rag-api
     ports:
-      - "8000:8000"
+      - "8080:8080"
     volumes:
       - ./data:/app/data          # Persist ChromaDB & raw data
       - ./.env:/app/.env          # Mount your .env file
     environment:
       - PYTHONUNBUFFERED=1
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8080 --reload
     restart: unless-stopped
 
   # ── Streamlit UI ─────────────────────────────────────────────

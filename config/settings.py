@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     # ── API ──────────────────────────────────────────────────
     api_host: str = Field("0.0.0.0", env="API_HOST")
-    api_port: int = Field(8000, env="API_PORT")
+    api_port: int = Field(8080, env="API_PORT")
 
     # ── KAP ──────────────────────────────────────────────────
     kap_base_url: str = Field("https://www.kap.org.tr", env="KAP_BASE_URL")
