@@ -13,6 +13,7 @@ import logging
 from typing import Annotated, TypedDict, Literal
 
 from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
@@ -24,6 +25,7 @@ from agent.prompts import (
     REWRITER_PROMPT,
     ANSWER_PROMPT,
     CONSISTENCY_PROMPT,
+    GENERAL_CHAT_PROMPT,
     DISCLAIMER,
 )
 from agent.tools import (
@@ -52,6 +54,7 @@ class AgentState(TypedDict):
     # Routing
     selected_sources: list[str]  # ["kap", "news", "brokerage"]
     routing_reasoning: str
+    interaction_mode: str  # "market" | "general"
 
     # Retrieval
     kap_context: str
@@ -77,7 +80,14 @@ class AgentState(TypedDict):
 # ─── LLM Setup ───────────────────────────────────────────────────────────────
 
 
-def _get_llm(temperature: float = 0.0) -> ChatGroq:
+def _get_llm(temperature: float = 0.0) -> ChatGroq | ChatOpenAI:
+    if settings.use_openai():
+        return ChatOpenAI(
+            api_key=settings.openai_api_key,
+            model=settings.openai_model,
+            temperature=temperature,
+            max_tokens=4096,
+        )
     return ChatGroq(
         api_key=settings.groq_api_key,
         model=settings.groq_model,
@@ -105,11 +115,25 @@ def route_query(state: AgentState) -> AgentState:
             raw = raw.split("```")[1].split("```")[0].strip()
 
         data = json.loads(raw)
-        sources = data.get("sources", ["kap", "news"])
+        mode_raw = str(data.get("mode", "market")).strip().lower()
+        interaction_mode = "general" if mode_raw == "general" else "market"
+
+        if interaction_mode == "general":
+            sources = []
+        else:
+            sources = data.get("sources", ["kap", "news", "brokerage"])
+            if not sources:
+                sources = ["kap", "news", "brokerage"]
+
         reasoning = data.get("reasoning", "")
         ticker = data.get("ticker", state.get("ticker", ""))
 
-        logger.info("Router: sources=%s, ticker=%s", sources, ticker)
+        logger.info(
+            "Router: mode=%s, sources=%s, ticker=%s",
+            interaction_mode,
+            sources,
+            ticker,
+        )
 
         # Determine answer type
         question_lower = state["question"].lower()
@@ -127,6 +151,7 @@ def route_query(state: AgentState) -> AgentState:
             "ticker": ticker,
             "answer_type": answer_type,
             "iteration_count": state.get("iteration_count", 0),
+            "interaction_mode": interaction_mode,
         }
     except Exception as exc:
         logger.warning("Router error: %s – defaulting to all sources", exc)
@@ -136,6 +161,7 @@ def route_query(state: AgentState) -> AgentState:
             "routing_reasoning": "Fallback: query all sources",
             "iteration_count": state.get("iteration_count", 0),
             "answer_type": "direct",
+            "interaction_mode": "market",
         }
 
 
@@ -339,7 +365,36 @@ def apply_guardrail_node(state: AgentState) -> AgentState:
     return {**state, "final_answer": safe_answer}
 
 
+def general_chat(state: AgentState) -> AgentState:
+    """Answer without RAG (greetings, general knowledge, off-topic)."""
+    llm = _get_llm(temperature=0.55)
+    chain = GENERAL_CHAT_PROMPT | llm
+    try:
+        response = chain.invoke({"question": state["question"]})
+        answer = response.content.strip()
+    except Exception as exc:
+        logger.error("General chat error: %s", exc)
+        answer = (
+            f"I could not reach the language model ({exc}). "
+            "Check OPENAI_API_KEY or GROQ_API_KEY in your .env file."
+        )
+    return {
+        **state,
+        "final_answer": answer,
+        "sources_used": [],
+        "answer_type": "general",
+        "grader_confidence": 1.0,
+        "iteration_count": 0,
+    }
+
+
 # ─── Routing Logic ────────────────────────────────────────────────────────────
+
+
+def route_after_router(state: AgentState) -> Literal["retrieve", "general_chat"]:
+    if state.get("interaction_mode") == "general":
+        return "general_chat"
+    return "retrieve"
 
 
 def should_rewrite(state: AgentState) -> Literal["rewrite", "answer"]:
@@ -365,10 +420,15 @@ def build_agent_graph() -> StateGraph:
     graph.add_node("rewrite", rewrite_query)
     graph.add_node("answer", generate_answer)
     graph.add_node("guardrail", apply_guardrail_node)
+    graph.add_node("general_chat", general_chat)
 
     # Define edges
     graph.set_entry_point("route_query")
-    graph.add_edge("route_query", "retrieve")
+    graph.add_conditional_edges(
+        "route_query",
+        route_after_router,
+        {"retrieve": "retrieve", "general_chat": "general_chat"},
+    )
     graph.add_edge("retrieve", "grade")
 
     # Conditional: sufficient → answer, else → rewrite
@@ -380,6 +440,7 @@ def build_agent_graph() -> StateGraph:
 
     graph.add_edge("rewrite", "retrieve")  # loop back
     graph.add_edge("answer", "guardrail")
+    graph.add_edge("general_chat", "guardrail")
     graph.add_edge("guardrail", END)
 
     return graph.compile()
@@ -431,6 +492,7 @@ def run_agent(
         "final_answer": "",
         "sources_used": [],
         "answer_type": "direct",
+        "interaction_mode": "market",
     }
 
     logger.info("Agent running: question='%s', ticker='%s'", question[:80], ticker)

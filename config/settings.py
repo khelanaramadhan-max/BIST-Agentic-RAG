@@ -4,7 +4,7 @@ All settings are read from environment variables or the .env file.
 """
 
 from pydantic_settings import BaseSettings
-from pydantic import Field
+from pydantic import Field, model_validator
 from pathlib import Path
 
 
@@ -12,9 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    # ── LLM ──────────────────────────────────────────────────
-    groq_api_key: str = Field(..., env="GROQ_API_KEY")
+    # ── LLM (use Groq and/or OpenAI; at least one key required) ─
+    groq_api_key: str = Field("", env="GROQ_API_KEY")
     groq_model: str = Field("llama-3.3-70b-versatile", env="GROQ_MODEL")
+    openai_api_key: str = Field("", env="OPENAI_API_KEY")
+    openai_model: str = Field("gpt-4o-mini", env="OPENAI_MODEL")
+    # auto = prefer OpenAI when OPENAI_API_KEY is set, else Groq
+    llm_provider: str = Field("auto", env="LLM_PROVIDER")
 
     # ── Embeddings ────────────────────────────────────────────
     embedding_model: str = Field(
@@ -59,6 +63,22 @@ class Settings(BaseSettings):
     supabase_key: str = Field("", env="SUPABASE_KEY")
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
+
+    @model_validator(mode="after")
+    def _require_any_llm_key(self):
+        if not (self.groq_api_key or self.openai_api_key):
+            raise ValueError(
+                "Set GROQ_API_KEY and/or OPENAI_API_KEY in your .env file (at least one is required)."
+            )
+        return self
+
+    def use_openai(self) -> bool:
+        p = (self.llm_provider or "auto").strip().lower()
+        if p == "openai":
+            return bool(self.openai_api_key)
+        if p == "groq":
+            return False
+        return bool(self.openai_api_key)
 
 
 # Singleton – import this everywhere

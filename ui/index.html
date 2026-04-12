@@ -7,6 +7,8 @@
     <title>BIST Equity Intelligence Agent</title>
     <meta name="description"
         content="Agentic RAG system for Turkish equity market intelligence — KAP disclosures, financial news, and brokerage research analysis.">
+    <!-- Optional: set your deployed FastAPI base URL for GitHub Pages / static hosting (https only if the page is https). -->
+    <meta name="bist-api-base" content="">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -648,6 +650,65 @@
                 max-width: 90%;
             }
         }
+
+        /* ── API connection strip ── */
+        .api-strip {
+            border-bottom: 1px solid var(--border);
+            background: rgba(18, 18, 30, 0.95);
+            padding: 10px 0;
+            font-size: 0.8rem;
+            z-index: 99;
+            position: relative;
+        }
+
+        .api-strip-inner {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 14px;
+        }
+
+        .api-strip-label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .api-strip code {
+            background: var(--surface2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: #a5b4fc;
+            word-break: break-all;
+        }
+
+        .api-strip-editor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .api-strip-editor input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+
+        .api-strip-warn {
+            color: #fca5a5;
+            font-size: 0.78rem;
+            max-width: 720px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 
@@ -669,6 +730,26 @@
         </div>
     </nav>
 
+    <div class="api-strip" id="api-strip">
+        <div class="container api-strip-inner">
+            <span class="api-strip-label">Backend</span>
+            <code id="api-base-display">detecting…</code>
+            <button type="button" class="btn btn-outline" id="api-config-btn"
+                style="padding:6px 12px;font-size:0.75rem">Change URL</button>
+            <span class="badge badge-primary" id="api-health-pill" style="display:none">API OK</span>
+            <span class="badge badge-warn" id="api-health-bad" style="display:none">Not connected</span>
+        </div>
+        <div class="container api-strip-editor" id="api-editor" style="display:none">
+            <input type="text" id="api-url-input" placeholder="http://127.0.0.1:8000" autocomplete="off">
+            <button type="button" class="btn btn-primary" style="padding:10px 18px;font-size:0.85rem"
+                id="api-save-btn">Save &amp; test</button>
+        </div>
+        <div class="container" id="api-https-warn" style="display:none;padding-top:4px">
+            <p class="api-strip-warn">This page is loaded over <strong>HTTPS</strong>, so the browser blocks calls to
+                <code>http://127.0.0.1:8000</code>. Deploy the FastAPI app behind <strong>HTTPS</strong> and paste that URL above, or open this UI from <code>http://127.0.0.1:8000</code> while running uvicorn.</p>
+        </div>
+    </div>
+
     <!-- ── HERO ──────────────────────────────────────────────────── -->
     <div class="container">
         <div class="hero">
@@ -688,9 +769,11 @@
             </div>
         </div>
 
-        <div class="disclaimer-banner" style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.2); color: #86efac;">
+        <div class="disclaimer-banner"
+            style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.2); color: #86efac;">
             <span class="disclaimer-icon">💡</span>
-            <span><strong>Pro Tip:</strong> You can ask complex questions! Combine KAP data, research reports, and news to uncover hidden market opportunities and deep narrative shifts.
+            <span><strong>Pro Tip:</strong> You can ask complex questions! Combine KAP data, research reports, and news
+                to uncover hidden market opportunities and deep narrative shifts.
             </span>
         </div>
 
@@ -767,7 +850,7 @@
         <!-- ── CHAT ── -->
         <div class="chat-section" id="chat-section">
             <div class="section-title">💬 Ask the Agent</div>
-            <div class="section-sub">Select a ticker and ask any BIST market intelligence question</div>
+            <div class="section-sub">Select a ticker and ask any BIST market intelligence question — or chat normally (hi, general questions). Open the app at <code style="font-size:0.85em">http://127.0.0.1:8000</code> while the API is running so requests hit the same server.</div>
 
             <!-- Ticker pills -->
             <div class="ticker-row" id="ticker-row">
@@ -887,7 +970,8 @@
     <footer>
         <p>
             BIST Equity Intelligence Agent &nbsp;•&nbsp;
-            Powered by <a href="https://groq.com">Groq</a> +
+            Powered by <a href="https://openai.com">OpenAI</a> /
+            <a href="https://groq.com">Groq</a> +
             <a href="https://www.langchain.com">LangChain</a> +
             <a href="https://www.trychroma.com">ChromaDB</a>
         </p>
@@ -897,8 +981,160 @@
     </footer>
 
     <script>
-        const API_BASE = 'http://localhost:8000';
+        let API_BASE = 'http://127.0.0.1:8000';
         let selectedTicker = '';
+
+        function normalizeApiBase(u) {
+            let s = String(u || '').trim().replace(/\/$/, '');
+            if (!s) return '';
+            if (!/^https?:\/\//i.test(s)) s = 'http://' + s;
+            return s;
+        }
+
+        function withTimeout(ms) {
+            const c = new AbortController();
+            const t = setTimeout(() => c.abort(), ms);
+            return { signal: c.signal, cancel: () => clearTimeout(t) };
+        }
+
+        async function probeHealth(base) {
+            const b = normalizeApiBase(base);
+            if (!b) return false;
+            const { signal, cancel } = withTimeout(5000);
+            try {
+                const r = await fetch(`${b}/health`, { method: 'GET', signal });
+                cancel();
+                return r.ok;
+            } catch (_) {
+                cancel();
+                return false;
+            }
+        }
+
+        async function discoverApiBase() {
+            const metaEl = document.querySelector('meta[name="bist-api-base"]');
+            const fromMeta = metaEl && metaEl.content && metaEl.content.trim();
+            const fromQuery = new URLSearchParams(location.search).get('api');
+            const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('BIST_API_BASE') : null;
+
+            const candidates = [];
+            if (fromQuery) candidates.push(normalizeApiBase(fromQuery));
+            if (fromMeta) candidates.push(normalizeApiBase(fromMeta));
+            if (saved) candidates.push(normalizeApiBase(saved));
+            candidates.push('http://127.0.0.1:8000', 'http://localhost:8000');
+            if (location.protocol !== 'file:') candidates.push(location.origin);
+
+            const seen = new Set();
+            for (const c of candidates) {
+                if (!c || seen.has(c)) continue;
+                seen.add(c);
+                if (await probeHealth(c)) return c;
+            }
+            return 'http://127.0.0.1:8000';
+        }
+
+        function uniqueBases(list) {
+            const out = [];
+            const seen = new Set();
+            for (const x of list) {
+                const b = normalizeApiBase(x);
+                if (!b || seen.has(b)) continue;
+                seen.add(b);
+                out.push(b);
+            }
+            return out;
+        }
+
+        async function fetchFromApiBest(path, options) {
+            const bases = uniqueBases([
+                API_BASE,
+                'http://127.0.0.1:8000',
+                'http://localhost:8000',
+                location.protocol !== 'file:' ? location.origin : null,
+            ]);
+            let lastResp = null;
+            for (const base of bases) {
+                try {
+                    const resp = await fetch(`${base}${path}`, options);
+                    lastResp = resp;
+                    if (resp.ok) {
+                        if (base !== API_BASE) {
+                            API_BASE = base;
+                            try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
+                            refreshApiUi();
+                        }
+                        return resp;
+                    }
+                    if (resp.status !== 404) return resp;
+                } catch (_) {
+                    /* wrong host, mixed content, or server down — try next */
+                }
+            }
+            return lastResp;
+        }
+
+        async function postQueryJson(body) {
+            return fetchFromApiBest('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+        }
+
+        function refreshApiUi() {
+            const el = document.getElementById('api-base-display');
+            if (el) el.textContent = API_BASE;
+            const httpsPage = location.protocol === 'https:';
+            const httpApi = API_BASE.startsWith('http:');
+            const warn = document.getElementById('api-https-warn');
+            if (warn) warn.style.display = httpsPage && httpApi ? 'block' : 'none';
+        }
+
+        async function verifyApiAndUpdatePills() {
+            const ok = await probeHealth(API_BASE);
+            const good = document.getElementById('api-health-pill');
+            const bad = document.getElementById('api-health-bad');
+            if (good) { good.style.display = ok ? 'inline-flex' : 'none'; }
+            if (bad) { bad.style.display = ok ? 'none' : 'inline-flex'; }
+            return ok;
+        }
+
+        document.getElementById('api-config-btn')?.addEventListener('click', () => {
+            const ed = document.getElementById('api-editor');
+            const input = document.getElementById('api-url-input');
+            if (!ed || !input) return;
+            const show = ed.style.display === 'none';
+            ed.style.display = show ? 'flex' : 'none';
+            if (show) {
+                input.value = API_BASE;
+                input.focus();
+            }
+        });
+
+        document.getElementById('api-save-btn')?.addEventListener('click', async () => {
+            const input = document.getElementById('api-url-input');
+            if (!input) return;
+            const next = normalizeApiBase(input.value);
+            if (!next) return;
+            API_BASE = next;
+            try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
+            refreshApiUi();
+            const ok = await verifyApiAndUpdatePills();
+            if (ok) {
+                document.getElementById('api-editor').style.display = 'none';
+                loadStats();
+            } else {
+                alert('Could not reach /health on that URL. Check the address and that uvicorn is running.');
+            }
+        });
+
+        (async function boot() {
+            API_BASE = await discoverApiBase();
+            try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
+            refreshApiUi();
+            verifyApiAndUpdatePills();
+            loadStats();
+        })();
 
         // ── Ticker selection ──────────────────────────────────────
         function selectTicker(btn) {
@@ -996,21 +1232,31 @@
             showLoading();
 
             try {
-                const resp = await fetch(`${API_BASE}/query`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        question,
-                        ticker: selectedTicker,
-                        chat_history: [],
-                    }),
+                const resp = await postQueryJson({
+                    question,
+                    ticker: selectedTicker,
+                    chat_history: [],
                 });
 
                 removeLoading();
 
-                if (!resp.ok) {
-                    const err = await resp.json();
-                    appendMessage('assistant', `❌ Error: ${err.detail || resp.statusText}`);
+                if (!resp || !resp.ok) {
+                    let detail = resp ? resp.statusText : 'Network error';
+                    if (resp) {
+                        try {
+                            const err = await resp.json();
+                            if (err.detail !== undefined) {
+                                detail = Array.isArray(err.detail)
+                                    ? err.detail.map(e => e.msg || e.type || JSON.stringify(e)).join(' ')
+                                    : String(err.detail);
+                            }
+                        } catch (_) { /* non-JSON body */ }
+                    }
+                    const hint404 = (resp && resp.status === 404) || !resp
+                        ? '<br><small>Open <strong>Change URL</strong> above and set <code>http://127.0.0.1:8000</code>, or run <code>python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload</code> and open this page from that same address. Add <code>?api=http://127.0.0.1:8000</code> to the URL to force the backend.</small>'
+                        : '';
+                    appendMessage('assistant', `❌ Error: ${detail}${hint404}`);
+                    verifyApiAndUpdatePills();
                     return;
                 }
 
@@ -1025,9 +1271,12 @@
             } catch (err) {
                 removeLoading();
                 appendMessage('assistant',
-                    `❌ Cannot reach the API at <code>${API_BASE}</code>.<br>
-                Make sure to run: <code>python -m uvicorn api.main:app --reload</code>`
+                    `❌ Cannot reach the API (browser blocked the request or the server is down).<br>
+                <small>Try <strong>Change URL</strong> with <code>http://127.0.0.1:8000</code>, or from the project folder run:<br>
+                <code>python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload</code><br>
+                If this site is HTTPS, you need an <strong>https://</strong> API URL or open the UI at <code>http://127.0.0.1:8000</code>.</small>`
                 );
+                verifyApiAndUpdatePills();
             } finally {
                 document.getElementById('send-btn').disabled = false;
             }
@@ -1036,8 +1285,8 @@
         // ── Load stats ────────────────────────────────────────────
         async function loadStats() {
             try {
-                const resp = await fetch(`${API_BASE}/stats`);
-                if (!resp.ok) return;
+                const resp = await fetchFromApiBest('/stats', { method: 'GET' });
+                if (!resp || !resp.ok) return;
                 const data = await resp.json();
                 const cols = data.collections || {};
                 document.getElementById('kap-count').textContent =
@@ -1051,7 +1300,6 @@
             }
         }
 
-        loadStats();
     </script>
 
 </body>

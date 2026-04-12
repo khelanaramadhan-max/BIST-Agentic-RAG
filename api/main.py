@@ -5,16 +5,19 @@ FastAPI REST API for the BIST Agentic RAG system.
 from __future__ import annotations
 
 import logging
-from typing import Any
-
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from config.settings import settings
 from guardrails.checker import check_question_safety
 
 logger = logging.getLogger(__name__)
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+UI_INDEX = REPO_ROOT / "ui" / "index.html"
 
 # ─── Supabase Client ─────────────────────────────────────────────────────────
 
@@ -52,7 +55,7 @@ app.add_middleware(
 
 
 class QueryRequest(BaseModel):
-    question: str = Field(..., min_length=5, max_length=1000, description="User question")
+    question: str = Field(..., min_length=1, max_length=1000, description="User question")
     ticker: str = Field("", max_length=10, description="Optional BIST ticker (e.g. ASELS)")
     chat_history: list[dict] = Field(default_factory=list, description="Previous messages")
 
@@ -94,8 +97,11 @@ class StatsResponse(BaseModel):
 # ─── Endpoints ───────────────────────────────────────────────────────────────
 
 
-@app.get("/", summary="Health check")
+@app.get("/", summary="Chat UI (or JSON if UI file missing)")
 def root():
+    """Serves the HTML chat client when present so `/query` hits the same server (avoids 404)."""
+    if UI_INDEX.is_file():
+        return FileResponse(UI_INDEX)
     return {
         "status": "running",
         "system": "BIST Equity Intelligence Agent",
@@ -110,6 +116,7 @@ def health():
 
 
 @app.get("/stats", response_model=StatsResponse, summary="Vector DB collection statistics")
+@app.get("/api/stats", response_model=StatsResponse, include_in_schema=False)
 def stats():
     try:
         from vectordb.chroma_store import collection_stats
@@ -119,6 +126,7 @@ def stats():
 
 
 @app.post("/query", response_model=QueryResponse, summary="Ask the BIST Intelligence Agent")
+@app.post("/api/query", response_model=QueryResponse, include_in_schema=False)
 def query(req: QueryRequest):
     """
     Submit a question about a BIST-listed company.

@@ -39,13 +39,41 @@ Available sources:
    - Common themes across analyst reports
    - Narrative evolution over time
 
+Also set **mode**:
+- **market** — the user wants BIST/KAP/news/research intelligence (including specific tickers, filings, or Turkish market questions).
+- **general** — greetings, small talk, generic knowledge unrelated to Turkish equity data, coding help, or anything that does not need the KAP/news/PDF corpus.
+
 Respond with a JSON object:
 {{
-  "sources": ["kap", "news", "brokerage"],  // list of relevant sources (1-3)
+  "mode": "market" | "general",
+  "sources": ["kap", "news", "brokerage"],
   "reasoning": "brief explanation",
   "needs_temporal_filter": true/false,
   "ticker": "extracted ticker or empty string"
 }}
+
+For mode **general**, set "sources": [].
+For mode **market**, include 1–3 sources from kap, news, brokerage.
+""",
+        ),
+        ("human", "{question}"),
+    ]
+)
+
+# ── General conversation (no RAG) ─────────────────────────────────────────────
+GENERAL_CHAT_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            f"""You are a helpful, friendly assistant. You can chat naturally (greetings, explanations, general topics).
+
+When the user asks about **Borsa İstanbul, KAP, or a specific stock**, briefly answer if you can, and suggest they can also ask for **retrieved** KAP/news/research evidence in this app for the most document-grounded view.
+
+{NON_ADVISORY_RULE}
+
+Do not claim you are browsing the live web unless tools explicitly provided that capability. For time-sensitive facts, note that your knowledge may have a cutoff date.
+
+Keep answers concise unless the user asks for detail.
 """,
         ),
         ("human", "{question}"),
