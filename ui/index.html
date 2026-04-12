@@ -9,7 +9,7 @@
         content="Agentic RAG system for Turkish equity market intelligence — KAP disclosures, financial news, and brokerage research analysis.">
     <!-- Injected at deploy time if repo secret BIST_API_BASE_URL is set; or set content="https://your-api..." manually. -->
     <meta name="bist-api-base" content="">
-    <meta name="bist-ui-revision" content="2026-04-12-pages-v2">
+    <meta name="bist-ui-revision" content="2026-04-12-fix-405-static-host">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -987,8 +987,16 @@
             if (!pageIsHttps()) {
                 list.push('http://127.0.0.1:8000', 'http://localhost:8000');
             }
-            if (!pageIsFile()) list.push(location.origin);
+            // Never POST to GitHub Pages / static hosts (405). Only same-origin on http (e.g. uvicorn serves UI+API).
+            if (!pageIsFile() && !pageIsHttps()) {
+                list.push(location.origin);
+            }
             return uniqueBases(list);
+        }
+
+        /** Statuses that mean "this host is not the FastAPI app" — try the next candidate base. */
+        function shouldTryNextApiBase(status) {
+            return status === 404 || status === 405 || status === 501;
         }
 
         function normalizeApiBase(u) {
@@ -1033,7 +1041,7 @@
             if (!pageIsHttps()) {
                 candidates.push('http://127.0.0.1:8000', 'http://localhost:8000');
             }
-            if (!pageIsFile()) candidates.push(location.origin);
+            if (!pageIsHttps() && !pageIsFile()) candidates.push(location.origin);
 
             const seen = new Set();
             for (const c of candidates) {
@@ -1041,7 +1049,7 @@
                 seen.add(c);
                 if (await probeHealth(c)) return c;
             }
-            if (pageIsHttps()) return location.origin;
+            if (pageIsHttps()) return '';
             if (pageIsFile()) return 'http://127.0.0.1:8000';
             return 'http://127.0.0.1:8000';
         }
@@ -1073,7 +1081,8 @@
                         }
                         return resp;
                     }
-                    if (resp.status !== 404) return resp;
+                    if (shouldTryNextApiBase(resp.status)) continue;
+                    return resp;
                 } catch (_) {
                     /* wrong host, mixed content, or server down — try next */
                 }
@@ -1095,7 +1104,7 @@
         }
 
         async function verifyApiAndUpdatePills() {
-            const ok = await probeHealth(API_BASE);
+            const ok = normalizeApiBase(API_BASE) ? await probeHealth(API_BASE) : false;
             const good = document.getElementById('api-health-pill');
             const bad = document.getElementById('api-health-bad');
             if (good) { good.style.display = ok ? 'inline-flex' : 'none'; }
@@ -1133,8 +1142,14 @@
         });
 
         (async function boot() {
+            try {
+                const prev = localStorage.getItem('BIST_API_BASE');
+                if (pageIsHttps() && prev && normalizeApiBase(prev) === location.origin) {
+                    localStorage.removeItem('BIST_API_BASE');
+                }
+            } catch (_) { }
             API_BASE = await discoverApiBase();
-            if (await probeHealth(API_BASE)) {
+            if (normalizeApiBase(API_BASE) && await probeHealth(API_BASE)) {
                 try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
             }
             refreshApiUi();
@@ -1249,7 +1264,7 @@
                 if (!resp || !resp.ok) {
                     let detail = '';
                     if (!resp) {
-                        detail = 'Could not reach the backend. Use <strong>Change URL</strong> above and enter your API base URL (must be <code>https://</code> when this site uses HTTPS), then <strong>Save &amp; test</strong>.';
+                        detail = 'No FastAPI backend is reachable from this page. Deploy the API with HTTPS (e.g. Railway, Render, Fly.io), then use <strong>Change URL</strong> and <strong>Save &amp; test</strong> with that base URL. Repository owners can also set the <code>BIST_API_BASE_URL</code> Actions secret so GitHub Pages embeds it automatically.';
                     } else {
                         detail = (resp.statusText || '').trim();
                         try {
