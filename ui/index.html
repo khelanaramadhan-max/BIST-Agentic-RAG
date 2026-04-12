@@ -7,7 +7,7 @@
     <title>BIST Equity Intelligence Agent</title>
     <meta name="description"
         content="Agentic RAG system for Turkish equity market intelligence — KAP disclosures, financial news, and brokerage research analysis.">
-    <!-- Optional: set your deployed FastAPI base URL for GitHub Pages / static hosting (https only if the page is https). -->
+    <!-- Injected at deploy time if repo secret BIST_API_BASE_URL is set; or set content="https://your-api..." manually. -->
     <meta name="bist-api-base" content="">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -702,13 +702,6 @@
             font-family: inherit;
             font-size: 0.85rem;
         }
-
-        .api-strip-warn {
-            color: #fca5a5;
-            font-size: 0.78rem;
-            max-width: 720px;
-            line-height: 1.4;
-        }
     </style>
 </head>
 
@@ -740,13 +733,9 @@
             <span class="badge badge-warn" id="api-health-bad" style="display:none">Not connected</span>
         </div>
         <div class="container api-strip-editor" id="api-editor" style="display:none">
-            <input type="text" id="api-url-input" placeholder="http://127.0.0.1:8000" autocomplete="off">
+            <input type="text" id="api-url-input" placeholder="https://your-backend.example.com" autocomplete="off">
             <button type="button" class="btn btn-primary" style="padding:10px 18px;font-size:0.85rem"
                 id="api-save-btn">Save &amp; test</button>
-        </div>
-        <div class="container" id="api-https-warn" style="display:none;padding-top:4px">
-            <p class="api-strip-warn">This page is loaded over <strong>HTTPS</strong>, so the browser blocks calls to
-                <code>http://127.0.0.1:8000</code>. Deploy the FastAPI app behind <strong>HTTPS</strong> and paste that URL above, or open this UI from <code>http://127.0.0.1:8000</code> while running uvicorn.</p>
         </div>
     </div>
 
@@ -850,7 +839,7 @@
         <!-- ── CHAT ── -->
         <div class="chat-section" id="chat-section">
             <div class="section-title">💬 Ask the Agent</div>
-            <div class="section-sub">Select a ticker and ask any BIST market intelligence question — or chat normally (hi, general questions). Open the app at <code style="font-size:0.85em">http://127.0.0.1:8000</code> while the API is running so requests hit the same server.</div>
+            <div class="section-sub">Select a ticker and ask any BIST market intelligence question — or chat normally (for example hi). If <strong>Backend</strong> shows Not connected, use <strong>Change URL</strong> and save your API base URL.</div>
 
             <!-- Ticker pills -->
             <div class="ticker-row" id="ticker-row">
@@ -981,13 +970,32 @@
     </footer>
 
     <script>
-        let API_BASE = 'http://127.0.0.1:8000';
+        let API_BASE = '';
         let selectedTicker = '';
+
+        function pageIsHttps() {
+            return location.protocol === 'https:';
+        }
+
+        function pageIsFile() {
+            return location.protocol === 'file:';
+        }
+
+        function fallbackBasesForFetch() {
+            const list = [API_BASE];
+            if (!pageIsHttps()) {
+                list.push('http://127.0.0.1:8000', 'http://localhost:8000');
+            }
+            if (!pageIsFile()) list.push(location.origin);
+            return uniqueBases(list);
+        }
 
         function normalizeApiBase(u) {
             let s = String(u || '').trim().replace(/\/$/, '');
             if (!s) return '';
-            if (!/^https?:\/\//i.test(s)) s = 'http://' + s;
+            if (!/^https?:\/\//i.test(s)) {
+                s = (pageIsHttps() ? 'https://' : 'http://') + s;
+            }
             return s;
         }
 
@@ -1021,8 +1029,10 @@
             if (fromQuery) candidates.push(normalizeApiBase(fromQuery));
             if (fromMeta) candidates.push(normalizeApiBase(fromMeta));
             if (saved) candidates.push(normalizeApiBase(saved));
-            candidates.push('http://127.0.0.1:8000', 'http://localhost:8000');
-            if (location.protocol !== 'file:') candidates.push(location.origin);
+            if (!pageIsHttps()) {
+                candidates.push('http://127.0.0.1:8000', 'http://localhost:8000');
+            }
+            if (!pageIsFile()) candidates.push(location.origin);
 
             const seen = new Set();
             for (const c of candidates) {
@@ -1030,6 +1040,8 @@
                 seen.add(c);
                 if (await probeHealth(c)) return c;
             }
+            if (pageIsHttps()) return location.origin;
+            if (pageIsFile()) return 'http://127.0.0.1:8000';
             return 'http://127.0.0.1:8000';
         }
 
@@ -1046,12 +1058,7 @@
         }
 
         async function fetchFromApiBest(path, options) {
-            const bases = uniqueBases([
-                API_BASE,
-                'http://127.0.0.1:8000',
-                'http://localhost:8000',
-                location.protocol !== 'file:' ? location.origin : null,
-            ]);
+            const bases = fallbackBasesForFetch();
             let lastResp = null;
             for (const base of bases) {
                 try {
@@ -1083,11 +1090,7 @@
 
         function refreshApiUi() {
             const el = document.getElementById('api-base-display');
-            if (el) el.textContent = API_BASE;
-            const httpsPage = location.protocol === 'https:';
-            const httpApi = API_BASE.startsWith('http:');
-            const warn = document.getElementById('api-https-warn');
-            if (warn) warn.style.display = httpsPage && httpApi ? 'block' : 'none';
+            if (el) el.textContent = API_BASE || '(not set)';
         }
 
         async function verifyApiAndUpdatePills() {
@@ -1130,7 +1133,9 @@
 
         (async function boot() {
             API_BASE = await discoverApiBase();
-            try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
+            if (await probeHealth(API_BASE)) {
+                try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
+            }
             refreshApiUi();
             verifyApiAndUpdatePills();
             loadStats();
@@ -1241,8 +1246,11 @@
                 removeLoading();
 
                 if (!resp || !resp.ok) {
-                    let detail = resp ? resp.statusText : 'Network error';
-                    if (resp) {
+                    let detail = '';
+                    if (!resp) {
+                        detail = 'Could not reach the backend. Use <strong>Change URL</strong> above and enter your API base URL (must be <code>https://</code> when this site uses HTTPS), then <strong>Save &amp; test</strong>.';
+                    } else {
+                        detail = (resp.statusText || '').trim();
                         try {
                             const err = await resp.json();
                             if (err.detail !== undefined) {
@@ -1251,11 +1259,9 @@
                                     : String(err.detail);
                             }
                         } catch (_) { /* non-JSON body */ }
+                        if (!detail) detail = `Request failed (HTTP ${resp.status}).`;
                     }
-                    const hint404 = (resp && resp.status === 404) || !resp
-                        ? '<br><small>Open <strong>Change URL</strong> above and set <code>http://127.0.0.1:8000</code>, or run <code>python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload</code> and open this page from that same address. Add <code>?api=http://127.0.0.1:8000</code> to the URL to force the backend.</small>'
-                        : '';
-                    appendMessage('assistant', `❌ Error: ${detail}${hint404}`);
+                    appendMessage('assistant', `❌ ${detail}`);
                     verifyApiAndUpdatePills();
                     return;
                 }
@@ -1271,10 +1277,7 @@
             } catch (err) {
                 removeLoading();
                 appendMessage('assistant',
-                    `❌ Cannot reach the API (browser blocked the request or the server is down).<br>
-                <small>Try <strong>Change URL</strong> with <code>http://127.0.0.1:8000</code>, or from the project folder run:<br>
-                <code>python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload</code><br>
-                If this site is HTTPS, you need an <strong>https://</strong> API URL or open the UI at <code>http://127.0.0.1:8000</code>.</small>`
+                    '❌ The request did not complete. Use <strong>Change URL</strong> to set a reachable API base URL (HTTPS if this page is HTTPS), then <strong>Save &amp; test</strong>.'
                 );
                 verifyApiAndUpdatePills();
             } finally {

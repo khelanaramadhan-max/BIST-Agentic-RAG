@@ -23,6 +23,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Inject backend URL into UI (optional)
+        env:
+          BIST_API_BASE_URL: ${{ secrets.BIST_API_BASE_URL }}
+        run: |
+          if [ -z "${BIST_API_BASE_URL:-}" ]; then
+            echo "No BIST_API_BASE_URL secret — add it under Settings → Secrets and variables → Actions to embed your HTTPS API URL for Pages."
+          else
+            python3 scripts/inject_bist_api_base.py
+          fi
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
