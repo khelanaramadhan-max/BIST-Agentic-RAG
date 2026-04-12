@@ -1195,8 +1195,12 @@
                     <div class="stat-label">Brokerage Chunks</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">3</div>
+                    <div class="stat-number">4</div>
                     <div class="stat-label">Data Sources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Live</div>
+                    <div class="stat-label">Web Search</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">LLM</div>
@@ -1296,6 +1300,11 @@
                     <div class="pipeline-step">
                         <div class="pipeline-icon">📥</div>
                         <div class="pipeline-label">Retrieve</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">🌐</div>
+                        <div class="pipeline-label">Web Search</div>
                     </div>
                     <div class="pipeline-arrow">→</div>
                     <div class="pipeline-step">
@@ -1430,6 +1439,32 @@
                 </div>
             </div>
 
+            <!-- Global Macro Signals -->
+            <div class="market-card">
+                <div class="market-card-header">
+                    <div class="market-card-title">🌐 Global Macro Signals</div>
+                    <div class="market-card-sub">Live</div>
+                </div>
+                <div class="market-summary-grid">
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">USD/TRY</div>
+                        <div class="summary-chip-value" id="macro-usd">34.2150</div>
+                    </div>
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">EUR/TRY</div>
+                        <div class="summary-chip-value" id="macro-eur">36.5412</div>
+                    </div>
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">Gold (oz)</div>
+                        <div class="summary-chip-value up" id="macro-gold">$2,345.10</div>
+                    </div>
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">Brent Crude</div>
+                        <div class="summary-chip-value down" id="macro-brent">$83.40</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Top BIST Stocks -->
             <div class="market-card">
                 <div class="market-card-header">
@@ -1498,6 +1533,8 @@
             { ticker: 'BIMAS', headline: 'BIM same-store sales growth accelerates to 38% amid persistent inflation', time: '52m ago' },
             { ticker: 'EREGL', headline: 'Ereğli steel volumes recover; European demand stabilizes in Q2', time: '1h ago' },
             { ticker: 'AKBNK', headline: 'CBRT holds rates steady; banking sector NPL ratio inches lower', time: '2h ago' },
+            { ticker: 'MACRO', headline: 'Fed signals potential rate cut in September amidst cooling inflation', time: '3h ago' },
+            { ticker: 'GLOBAL', headline: 'Brent crude slides below $84 as demand concerns outweigh supply risks', time: '4h ago' }
         ];
 
         const SPARKLINE_HEIGHTS = [28, 32, 30, 38, 35, 42, 40, 44, 38, 41, 39, 44];
@@ -1621,6 +1658,12 @@
                 const now = new Date();
                 st.textContent = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             }
+
+            // Update macro randomly
+            if (el('macro-usd')) el('macro-usd').textContent = (34.2150 + (Math.random() - 0.5) * 0.05).toFixed(4);
+            if (el('macro-eur')) el('macro-eur').textContent = (36.5412 + (Math.random() - 0.5) * 0.05).toFixed(4);
+            if (el('macro-gold')) el('macro-gold').textContent = '$' + (2345.10 + (Math.random() - 0.5) * 5).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            if (el('macro-brent')) el('macro-brent').textContent = '$' + (83.40 + (Math.random() - 0.5) * 1).toFixed(2);
         }
 
         function refreshMarketData() {
