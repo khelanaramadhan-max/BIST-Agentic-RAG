@@ -9,7 +9,7 @@
         content="Agentic RAG system for Turkish equity market intelligence — KAP disclosures, financial news, and brokerage research analysis.">
     <!-- Injected at deploy time if repo secret BIST_API_BASE_URL is set; or set content="https://your-api..." manually. -->
     <meta name="bist-api-base" content="">
-    <meta name="bist-ui-revision" content="2026-04-12-fix-405-static-host">
+    <meta name="bist-ui-revision" content="2026-04-12-v3-no-405-leak">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -982,12 +982,25 @@
             return location.protocol === 'file:';
         }
 
+        /** True if base URL is this exact website (GitHub Pages cannot host POST /query — always 405). */
+        function apiBaseIsThisDocumentSite(base) {
+            const b = normalizeApiBase(base);
+            if (!b) return false;
+            try {
+                return new URL(b).origin === location.origin;
+            } catch (_) {
+                return false;
+            }
+        }
+
         function fallbackBasesForFetch() {
-            const list = [API_BASE];
+            const list = [];
+            if (normalizeApiBase(API_BASE) && !apiBaseIsThisDocumentSite(API_BASE)) {
+                list.push(API_BASE);
+            }
             if (!pageIsHttps()) {
                 list.push('http://127.0.0.1:8000', 'http://localhost:8000');
             }
-            // Never POST to GitHub Pages / static hosts (405). Only same-origin on http (e.g. uvicorn serves UI+API).
             if (!pageIsFile() && !pageIsHttps()) {
                 list.push(location.origin);
             }
@@ -1046,6 +1059,7 @@
             const seen = new Set();
             for (const c of candidates) {
                 if (!c || seen.has(c)) continue;
+                if (pageIsHttps() && apiBaseIsThisDocumentSite(c)) continue;
                 seen.add(c);
                 if (await probeHealth(c)) return c;
             }
@@ -1086,6 +1100,9 @@
                 } catch (_) {
                     /* wrong host, mixed content, or server down — try next */
                 }
+            }
+            if (lastResp && !lastResp.ok && shouldTryNextApiBase(lastResp.status)) {
+                return null;
             }
             return lastResp;
         }
@@ -1129,6 +1146,10 @@
             if (!input) return;
             const next = normalizeApiBase(input.value);
             if (!next) return;
+            if (pageIsHttps() && apiBaseIsThisDocumentSite(next)) {
+                alert('That URL is this static website. Paste the URL of your FastAPI server (HTTPS), not the GitHub Pages address.');
+                return;
+            }
             API_BASE = next;
             try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
             refreshApiUi();
@@ -1144,11 +1165,14 @@
         (async function boot() {
             try {
                 const prev = localStorage.getItem('BIST_API_BASE');
-                if (pageIsHttps() && prev && normalizeApiBase(prev) === location.origin) {
+                if (pageIsHttps() && prev && apiBaseIsThisDocumentSite(prev)) {
                     localStorage.removeItem('BIST_API_BASE');
                 }
             } catch (_) { }
             API_BASE = await discoverApiBase();
+            if (pageIsHttps() && apiBaseIsThisDocumentSite(API_BASE)) {
+                API_BASE = '';
+            }
             if (normalizeApiBase(API_BASE) && await probeHealth(API_BASE)) {
                 try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
             }

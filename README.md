@@ -66,6 +66,8 @@ This repository deploys the chat UI from the `ui` folder via **GitHub Actions** 
 
 If you must use **Deploy from branch** with the repository root, open **`/ui/index.html`**, or use the root **`index.html`** in this repo (it redirects to `ui/index.html`).
 
+**GitHub Pages chat needs a separate HTTPS API.** Pages only serves static files; it cannot run Python or accept `POST /query`. Use the included **`render.yaml`** to deploy the Docker API on [Render](https://render.com), copy the service URL (e.g. `https://bist-rag-api.onrender.com`), then either set repository secret **`BIST_API_BASE_URL`** to that URL (recommended) or paste it under **Change URL** on the live site.
+
 ---
 
 ## 🔌 Using the API (Swagger)
