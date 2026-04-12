@@ -1,0 +1,74 @@
+{
+  "summary": {
+    "n_questions": 3,
+    "avg_overall": 0.7,
+    "avg_faithfulness": 0.5,
+    "avg_relevancy": 0.5,
+    "avg_source_coverage": 1.0,
+    "disclaimer_rate": 1.0,
+    "non_advisory_rate": 1.0,
+    "avg_latency_sec": 17.86,
+    "avg_iterations": 0.0,
+    "by_category": {
+      "kap_centric": 0.7
+    }
+  },
+  "results": [
+    {
+      "question_id": "kap_001",
+      "question": "ASELS son 6 ayda hangi tür KAP açıklamaları yaptı?",
+      "ticker": "ASELS",
+      "category": "kap_centric",
+      "answer": "ASELSAN (ASELS), bir Türk savunma sanayii şirketi olup, çeşitli finansal ve faaliyetle ilgili açıklamaları Kamuyu Aydınlatma Platformu (KAP) aracılığıyla yapar. 6 aylık bir dönemde ASELSAN'ın yaptığı KAP açıklamaları, şirketin finansal performansını, yeni projelerini, sözleşmelerini ve diğer önemli gelişmeleri içerebilir.\n\nBu açıklamalar arasında aşağıdaki türde olanlar bulunabilir:\n1. **Finansal Tablolar**: Şirketin mali durumunu gösteren finansal tablolar, gelir tablosu, bilanço ve nakit akım ...",
+      "sources_used": [
+        "kap"
+      ],
+      "iteration_count": 0,
+      "faithfulness": 0.5,
+      "answer_relevancy": 0.5,
+      "source_coverage": 1.0,
+      "disclaimer_present": true,
+      "non_advisory": true,
+      "latency_sec": 30.3
+    },
+    {
+      "question_id": "kap_002",
+      "question": "GARAN'ın son KAP açıklamalarında öne çıkan konular nelerdir?",
+      "ticker": "GARAN",
+      "category": "kap_centric",
+      "answer": "I encountered an error processing your question. Error: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01knzbkw7ff669hvpnvcxa330x` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99945, Requested 1944. Please try again in 27m12.096s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}\n\nPlease try rephrasing your questi...",
+      "sources_used": [
+        "kap",
+        "news",
+        "brokerage",
+        "web"
+      ],
+      "iteration_count": 0,
+      "faithfulness": 0.5,
+      "answer_relevancy": 0.5,
+      "source_coverage": 1.0,
+      "disclaimer_present": true,
+      "non_advisory": true,
+      "latency_sec": 11.31
+    },
+    {
+      "question_id": "kap_003",
+      "question": "THYAO için son 3 ayda kaç adet özel durum açıklaması yapıldı?",
+      "ticker": "THYAO",
+      "category": "kap_centric",
+      "answer": "I encountered an error processing your question. Error: Error code: 429 - {'error': {'message': 'Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01knzbkw7ff669hvpnvcxa330x` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99924, Requested 5645. Please try again in 1h20m11.616s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}\n\nPlease try rephrasing your ques...",
+      "sources_used": [
+        "kap",
+        "news",
+        "web"
+      ],
+      "iteration_count": 0,
+      "faithfulness": 0.5,
+      "answer_relevancy": 0.5,
+      "source_coverage": 1.0,
+      "disclaimer_present": true,
+      "non_advisory": true,
+      "latency_sec": 11.96
+    }
+  ]
+}

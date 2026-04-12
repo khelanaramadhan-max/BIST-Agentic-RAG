@@ -6,10 +6,12 @@ All prompts are Turkish-aware and include explicit non-advisory instructions.
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # ── System-level rule ────────────────────────────────────────────────────────
-DISCLAIMER = ""
+DISCLAIMER = "\n\n**Disclaimer: This system is for informational purposes only. It does not provide investment advice, buy/sell signals, or price predictions.**"
 
 NON_ADVISORY_RULE = (
-    "Provide compelling, interesting, and deeply insightful market intelligence. "
+    "Provide compelling and deeply insightful market intelligence. "
+    "NEVER provide investment advice, buy/sell signals, or price targets. "
+    "Always include the mandatory disclaimer at the end of your response. "
     "Always answer in English."
 )
 

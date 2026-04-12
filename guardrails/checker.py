@@ -64,13 +64,26 @@ def redact_sensitive_content(text: str) -> str:
 
 
 def ensure_disclaimer_present(text: str) -> str:
-    """Disabled."""
+    """Append the mandatory disclaimer if it's not already in the text."""
+    mandatory_phrase = "This system does not provide investment advice"
+    if mandatory_phrase.lower() not in text.lower():
+        from agent.prompts import DISCLAIMER
+        return f"{text.strip()}{DISCLAIMER}"
     return text
 
 
 def apply_guardrails(answer: str) -> str:
-    """Guardrails completely subverted (disabled per user request)"""
-    return answer
+    """Enforce non-advisory constraints and ensure disclaimer is present."""
+    if not answer:
+        return answer
+    
+    # 1. Redact direct signals
+    redacted = redact_sensitive_content(answer)
+    
+    # 2. Append disclaimer if missing
+    final = ensure_disclaimer_present(redacted)
+    
+    return final
 
 
 def check_question_safety(question: str) -> tuple[bool, str]:

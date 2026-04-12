@@ -34,7 +34,7 @@ st.markdown(
 
 .hero-badge {
     display: inline-block;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #e10019, #b30014);
     color: white;
     font-size: 0.75rem;
     font-weight: 700;
@@ -54,12 +54,12 @@ st.markdown(
     backdrop-filter: blur(10px);
 }
 
-.stat-number { color: #667eea; font-size: 1.8rem; font-weight: 700; }
+.stat-number { color: #e10019; font-size: 1.8rem; font-weight: 700; }
 .stat-label { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; }
 
 .answer-box {
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid rgba(102, 126, 234, 0.3);
+    background: rgba(225, 0, 25, 0.1);
+    border: 1px solid rgba(225, 0, 25, 0.3);
     border-radius: 12px;
     padding: 20px;
     margin: 12px 0;
@@ -67,9 +67,9 @@ st.markdown(
 
 .source-chip {
     display: inline-block;
-    background: rgba(102, 126, 234, 0.2);
-    border: 1px solid rgba(102, 126, 234, 0.4);
-    color: #a5b4fc;
+    background: rgba(225, 0, 25, 0.2);
+    border: 1px solid rgba(225, 0, 25, 0.4);
+    color: #ff99a1;
     font-size: 0.75rem;
     padding: 3px 10px;
     border-radius: 20px;
@@ -88,7 +88,7 @@ st.markdown(
 
 .ticker-chip {
     display: inline-block;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #e10019, #b30014);
     color: white;
     font-weight: 700;
     font-size: 0.9rem;
@@ -105,7 +105,7 @@ st.markdown(
 
 col_logo, col_title = st.columns([1, 6])
 with col_logo:
-    st.markdown("# 📊")
+    st.markdown('<div style="font-size:2rem;font-weight:800;font-style:italic;color:#e10019;line-height:1;margin-top:10px;">Bt</div>', unsafe_allow_html=True)
 with col_title:
     st.markdown('<div class="hero-badge">BIST Intelligence Agent</div>', unsafe_allow_html=True)
     st.markdown("# Turkish Equity Intelligence")

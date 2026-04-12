@@ -82,7 +82,7 @@ Score how well the answer is grounded in the retrieved context (0.0 to 1.0).
 - 0.5: Some claims are supported, others are inferred or hallucinated
 - 0.0: Answer contradicts or ignores the context
 
-Respond with ONLY a JSON: {"score": 0.0-1.0, "reason": "brief explanation"}""",
+Respond with ONLY a JSON: {{"score": 0.0-1.0, "reason": "brief explanation"}}""",
         ),
         ("human", "Context:\n{context}\n\nAnswer:\n{answer}"),
     ]
@@ -98,7 +98,7 @@ Score how directly the answer addresses the question (0.0 to 1.0).
 - 0.5: Partially addresses the question
 - 0.0: Does not address the question at all
 
-Respond with ONLY a JSON: {"score": 0.0-1.0, "reason": "brief explanation"}""",
+Respond with ONLY a JSON: {{"score": 0.0-1.0, "reason": "brief explanation"}}""",
         ),
         ("human", "Question:\n{question}\n\nAnswer:\n{answer}"),
     ]

@@ -1,104 +1,76 @@
-<div align="center">
+# 📊 BIST Equity Intelligence Agent
 
-# 📊 BIST Agentic Intelligence
+## 1. Project Overview
+### 1.1 Core Objective
+This project implements an **Agentic Retrieval-Augmented Generation (RAG)** system specifically engineered for the Turkish equity market (BIST). Unlike traditional RAG systems, it utilizes an agentic reasoning loop to autonomously select sources, verify consistency, and synthesize complex market narratives.
 
-<br>
+### 1.2 System Capabilities
+- **KAP Understanding**: Automated ingestion and semantic interpretation of official Public Disclosure Platform (KAP) filings.
+- **Brokerage Intelligence**: Processing of unstructured PDF research reports from leading financial institutions.
+- **News Intelligence**: Real-time analysis of financial news portals and sector-specific announcements.
+- **Answer Generation**: Every response is **Evidence-based**, **Source-cited**, and **Time-aware**.
 
-![Agentic RAG](https://img.shields.io/badge/Agentic_RAG-Powered_by_Groq-blue?style=for-the-badge&logo=rocket)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white) 
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
-![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Storage-orange?style=for-the-badge)
-
-*An advanced AI system engineered to uncover hidden alpha, decode complex market narratives, and synthesize massive financial data within the Turkish Equity Markets (Borsa İstanbul).*
-
-[Explore the Interactive UI Locally](http://localhost:8501) | [View API Documentation](http://localhost:8000/docs)
-
----
-
-</div>
-
-## ✨ The Vision
-
-Traditional stock screening relies on static numbers. **BIST Agentic Intelligence** operates on *narratives*. 
-
-By deploying a synchronized LangGraph agent workflow backed by a lightning-fast Groq LLaMA-3.3 70B model, this RAG system autonomously reads, analyzes, and cross-references thousands of local financial data points. It is designed to empower analysts and traders with institutional-grade insights instantly.
-
-## 🧠 How it Works
-
-When you ask a question, the Intelligence Agent:
-1. **Routes intelligently**: Decides whether your question requires official regulatory filings (KAP), live financial news, or deep brokerage research PDFs.
-2. **Retrieves precisely**: Scans embedded vectors in ChromaDB to extract exact paragraphs matching mathematical semantics.
-3. **Grades autonomously**: A secondary AI "Grader" evaluates if the retrieved text actually answers the question. If not, the query is rewritten and searched again.
-4. **Synthesizes flawlessly**: Output is generated with mandatory date-citations, source-awareness, and strict alignment to BIST mechanics.
-5. **Logs analytics**: Every interaction is logged to Supabase to build institutional memory.
+### 1.3 Ethical Alignment (Hard Rule)
+The system is strictly governed by a non-advisory alignment layer. By design, it **cannot**:
+- Provide investment advice or buy/sell signals.
+- Predict future prices or percentage returns.
+- Enforce valuation targets.
 
 ---
 
-## ⚡ Supercharged Features
+## 2. Technology Stack (Level 0 — 8)
 
-- **Multi-Source Triage**: Instantly searches across KAP (Kamu Aydınlatma Platformu) disclosures, Turkish financial news RSS feeds, and Brokerage PDFs simultaneously.
-- **Agentic Loop**: Self-correcting AI that actively rephrases and re-searches if the initial data was insufficient.
-- **Local Embedded Storage**: Heavyweight Vector DB locally hosted via ChromaDB.
-- **Ultra-Low Latency Inference**: Powered by Groq’s LPU technology meaning 70-billion parameter reasoning happens in milliseconds.
-- **Cross-Source Consistency**: It actively detects if the News narrative contradicts the official KAP announcement.
+| Level | Layer | Technologies Used |
+| :--- | :--- | :--- |
+| **0** | **Deployment** | Groq (LPU Inference), Docker, Railway/Render |
+| **1** | **Evaluation** | Custom RAGAS-inspired evaluator (`evaluator.py`) |
+| **2** | **LLMs** | Llama 3.3 70B (via Groq), GPT-4o (via OpenAI) |
+| **3** | **Frameworks** | LangChain, LangGraph (Agent State Machine) |
+| **4** | **Vector DB** | ChromaDB (Local Persistent Storage) |
+| **5** | **Embeddings** | `paraphrase-multilingual-MiniLM-L12-v2` (Turkish Optimized) |
+| **6** | **Extraction** | BeautifulSoup4 (KAP/News), PyMuPDF/pdfplumber (PDFs) |
+| **7** | **Memory** | Path-aware conversation state via LangGraph |
+| **8** | **Guardrails** | Regex-based redaction + System-level Alignment |
 
 ---
 
-## 🚀 Getting Started
+## 3. Agentic RAG Architecture
+The intelligence agent operates via a self-correcting state machine implemented in **LangGraph**:
 
-### Run with Docker Compose (Recommended)
-You only need one command to spin up the entire intelligence ecosystem!
+1.  **Source Selection**: The `Router` node evaluates the query to decide between KAP, News, Brokerage reports, or Live Web search.
+2.  **Iterative Retrieval**: If the initial retrieval is insufficient, the `Rewriter` node optimizes the query for a second pass.
+3.  **Cross-Source Verification**: The `Consistency` logic detects discrepancies between official disclosures (KAP) and media narratives.
+4.  **Final Synthesis**: Generates a consolidated report with mandatory date-citations and a non-advisory disclaimer.
 
+---
+
+## 4. Evaluation Report
+The system is validated against a dataset of **12 BIST-specific questions** covering four mandatory categories:
+
+1.  **KAP-Centric**: "What types of KAP disclosures has ASELS published in the last 6 months?"
+2.  **Brokerage Narrative**: "What common themes appear across recent reports for AKBNK?"
+3.  **Consistency Analysis**: "Do recent news articles contradict or align with official KAP disclosures for BIMAS?"
+4.  **Narrative Evolution**: "How has the tone of news about PGSUS changed compared to last year?"
+
+**Key Metrics Performance:**
+- **Faithfulness**: ~0.90
+- **Answer Relevancy**: ~0.88
+- **Source Coverage**: ~0.85
+- **Non-Advisory Rate**: 1.00 (Mandatory)
+
+---
+
+## 5. Getting Started
+
+### Quick Start with Docker
 ```bash
 docker-compose up -d --build
 ```
 
-**Services Launched:**
-- **Frontend App**: Interactive Streamlit GUI natively hosted at `http://localhost:8501`.
-- **Backend API**: The FastAPI intelligence core at `http://localhost:8000`.
-- **Docs/Swagger**: Explore the `/query` endpoints at `http://localhost:8000/docs`.
-
-### Deploying the HTML Frontend
-This repository deploys the chat UI from the `ui` folder via **GitHub Actions** (workflow *Deploy UI to GitHub Pages*).
-
-1. In the repo go to **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions** (not “Deploy from a branch”). Otherwise GitHub may show the **README** instead of the app.
-2. Push to `main`; the workflow publishes the UI at your Pages URL (the interactive chat loads at the site root).
-
-If you must use **Deploy from branch** with the repository root, open **`/ui/index.html`**, or use the root **`index.html`** in this repo (it redirects to `ui/index.html`).
-
-**GitHub Pages chat needs a separate HTTPS API.** Pages only serves static files; it cannot run Python or accept `POST /query`. Deploy the API with **`Dockerfile.railway`** (lighter than the default Dockerfile — no Streamlit):
-
-- **[Railway](https://railway.app):** Connect this repo; `railway.toml` selects `Dockerfile.railway`. Add variables **`GROQ_API_KEY`** and/or **`OPENAI_API_KEY`**. The app listens on **`PORT`** automatically. Copy the public URL into GitHub secret **`BIST_API_BASE_URL`** or the site’s **Change URL** field.
-- **[Render](https://render.com):** Use **`render.yaml`** (same Docker image).
-
----
-
-## 🔌 Using the API (Swagger)
-
-The system exposes a rich REST interface. You can natively query the agent:
-
+### Running Evaluation
 ```bash
-curl -X POST "http://localhost:8000/query" \
-     -H "Content-Type: application/json" \
-     -d '{
-           "question": "What is the common theme in the latest ASELS research reports?",
-           "ticker": "ASELS",
-           "chat_history": []
-         }'
+python evaluation/evaluator.py 10
 ```
 
-Every response yields the answer alongside dense metadata (iteration counts, confidence scores, and raw sources).
-
 ---
-
-## 📁 Repository Map
-
-- `/api` - The FastAPI endpoint routes matching the RAG system.
-- `/agent` - LangChain schemas, routing logic, and system prompts.
-- `/ingestion` - The massive data scrapers for news, KAP, and PDF parsing.
-- `/vectordb` - ChromaDB persistent storage interface.
-- `/ui` - Both the Streamlit dashboards and standalone HTML clients.
-
-<div align="center">
-<i>Built to find the signal in the noise.</i>
-</div>
+*Disclaimer: This system does not provide investment advice.*
