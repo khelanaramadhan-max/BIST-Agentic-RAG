@@ -18,3 +18,5 @@ services:
         sync: false
       - key: LLM_PROVIDER
         value: auto
+      - key: PORT
+        value: "8080"

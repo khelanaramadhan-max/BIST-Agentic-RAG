@@ -33,5 +33,5 @@ RUN mkdir -p data/raw/kap data/raw/news data/raw/pdfs data/processed data/chroma
 
 EXPOSE 8080 8501
 
-# Railway / Render set PORT; docker-compose can keep port 8000
+# Railway / Render set PORT; default 8080 for local `docker run`
 CMD ["sh", "-c", "exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
