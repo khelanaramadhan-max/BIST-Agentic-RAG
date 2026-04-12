@@ -1,6 +1,8 @@
+# Slim production image for Railway (FastAPI only — no Streamlit).
+# Installs CPU PyTorch first to avoid huge CUDA wheels, then Chroma / sentence-transformers.
+
 FROM python:3.11-slim-bookworm
 
-# Chroma / hnswlib often compile on install; torch needs libgomp at runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
@@ -20,18 +22,19 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY requirements-api.txt .
 
+# CPU-only torch (smaller); then the rest of the API stack
 RUN pip install --upgrade pip setuptools wheel \
     && pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir -r requirements-api.txt
 
 COPY . .
 
 RUN mkdir -p data/raw/kap data/raw/news data/raw/pdfs data/processed data/chromadb \
     && mkdir -p /app/.cache/huggingface
 
-EXPOSE 8000 8501
+EXPOSE 8000
 
-# Railway / Render set PORT; docker-compose can keep port 8000
+# Railway sets PORT; default 8000 for local `docker run`
 CMD ["sh", "-c", "exec uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

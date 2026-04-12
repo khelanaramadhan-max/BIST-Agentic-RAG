@@ -9,23 +9,31 @@
         content="Agentic RAG system for Turkish equity market intelligence — KAP disclosures, financial news, and brokerage research analysis.">
     <!-- Injected at deploy time if repo secret BIST_API_BASE_URL is set; or set content="https://your-api..." manually. -->
     <meta name="bist-api-base" content="">
-    <meta name="bist-ui-revision" content="2026-04-12-v3-no-405-leak">
+    <meta name="bist-ui-revision" content="2026-04-12-v4-live-market">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
         rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a14;
-            --surface: #12121e;
-            --surface2: #1a1a2e;
-            --border: rgba(255, 255, 255, 0.08);
-            --accent: #667eea;
-            --accent2: #764ba2;
+            --bg: #080b14;
+            --surface: #0e1420;
+            --surface2: #141b2d;
+            --surface3: #1a2236;
+            --border: rgba(99, 179, 237, 0.1);
+            --border2: rgba(99, 179, 237, 0.18);
+            --accent: #3b82f6;
+            --accent2: #6366f1;
+            --accent3: #8b5cf6;
+            --teal: #06b6d4;
             --text: #e2e8f0;
             --text-muted: #64748b;
+            --text-dim: #475569;
             --danger: #ef4444;
-            --success: #22c55e;
+            --success: #10b981;
             --warning: #f59e0b;
+            --gold: #fbbf24;
+            --red-tick: #f87171;
+            --green-tick: #34d399;
         }
 
         * {
@@ -42,21 +50,22 @@
             overflow-x: hidden;
         }
 
-        /* Animated background */
+        /* ── Animated background nebula ── */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             background:
-                radial-gradient(ellipse at 20% 20%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
+                radial-gradient(ellipse at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 80%, rgba(99, 102, 241, 0.10) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse at 70% 10%, rgba(6, 182, 212, 0.07) 0%, transparent 40%);
             pointer-events: none;
             z-index: 0;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             padding: 0 24px;
             position: relative;
@@ -66,19 +75,19 @@
         /* ── NAV ── */
         nav {
             border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            background: rgba(10, 10, 20, 0.8);
+            backdrop-filter: blur(24px);
+            background: rgba(8, 11, 20, 0.85);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 200;
         }
 
         .nav-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
-            max-width: 1200px;
+            padding: 14px 24px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
@@ -91,18 +100,19 @@
         }
 
         .nav-logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-radius: 8px;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
         }
 
         .badge {
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             font-weight: 700;
             padding: 3px 8px;
             border-radius: 20px;
@@ -121,541 +131,138 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        /* ── HERO ── */
-        .hero {
-            padding: 80px 24px 60px;
-            text-align: center;
+        .badge-teal {
+            background: rgba(6, 182, 212, 0.15);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, 0.3);
         }
 
-        .hero-eyebrow {
-            display: inline-flex;
+        .nav-actions {
+            display: flex;
+            gap: 10px;
             align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #a5b4fc;
+        }
+
+        /* ── MARKET TICKER TAPE ── */
+        .ticker-tape {
+            background: rgba(14, 20, 32, 0.95);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            overflow: hidden;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 150;
+        }
+
+        .ticker-tape-label {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0 12px;
             letter-spacing: 1px;
             text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 800;
-            line-height: 1.15;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-subtitle {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto 32px;
-            line-height: 1.7;
-        }
-
-        .hero-cta {
+            height: 100%;
             display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
+            align-items: center;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
 
+        .ticker-tape-scroll {
+            display: flex;
+            animation: scrollTicker 35s linear infinite;
+            gap: 0;
+            flex-shrink: 0;
+        }
+
+        .ticker-tape:hover .ticker-tape-scroll {
+            animation-play-state: paused;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 20px;
+            border-right: 1px solid var(--border);
+            font-size: 0.78rem;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+            height: 38px;
+        }
+
+        .ticker-item .t-symbol {
+            font-weight: 700;
+            color: #93c5fd;
+        }
+
+        .ticker-item .t-price {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .ticker-item .t-change.up {
+            color: var(--green-tick);
+        }
+
+        .ticker-item .t-change.down {
+            color: var(--red-tick);
+        }
+
+        .ticker-item .t-arrow {
+            font-size: 0.65rem;
+        }
+
+        @keyframes scrollTicker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ── BUTTONS ── */
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 0.95rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             border: none;
             text-decoration: none;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             color: white;
-            box-shadow: 0 4px 24px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.48);
         }
 
         .btn-outline {
             background: transparent;
             color: var(--text);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border2);
         }
 
         .btn-outline:hover {
             background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(99, 179, 237, 0.3);
         }
 
-        /* ── DISCLAIMER ── */
-        .disclaimer-banner {
-            background: rgba(239, 68, 68, 0.08);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 12px;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.85rem;
-            color: #fca5a5;
-            max-width: 900px;
-            margin: 0 auto 60px;
-        }
-
-        .disclaimer-icon {
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        /* ── STATS ── */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            margin-bottom: 60px;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            transition: border-color 0.2s;
-        }
-
-        .stat-card:hover {
-            border-color: rgba(102, 126, 234, 0.4);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-top: 4px;
-        }
-
-        /* ── CHAT ── */
-        .chat-section {
-            margin-bottom: 60px;
-        }
-
-        .section-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .section-sub {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-        }
-
-        /* Ticker selector */
-        .ticker-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .ticker-btn {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            transition: all 0.15s;
-            letter-spacing: 0.5px;
-        }
-
-        .ticker-btn:hover,
-        .ticker-btn.active {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-color: transparent;
-            color: white;
-        }
-
-        /* Sample question chips */
-        .sample-chips {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .chip {
-            padding: 6px 12px;
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.25);
-            border-radius: 20px;
-            font-size: 0.78rem;
-            cursor: pointer;
-            color: #a5b4fc;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-
-        .chip:hover {
-            background: rgba(102, 126, 234, 0.25);
-            border-color: rgba(102, 126, 234, 0.5);
-        }
-
-        /* Chat window */
-        .chat-window {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        .chat-messages {
-            min-height: 360px;
-            max-height: 480px;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-        }
-
-        .msg {
-            display: flex;
-            gap: 12px;
-            animation: fadeInUp 0.3s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .msg.user {
-            flex-direction: row-reverse;
-        }
-
-        .msg-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .msg.user .msg-avatar {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-        }
-
-        .msg.assistant .msg-avatar {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-        }
-
-        .msg-bubble {
-            max-width: 75%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        .msg.user .msg-bubble {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.25));
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            text-align: right;
-        }
-
-        .msg.assistant .msg-bubble {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-        }
-
-        .msg-meta {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 6px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .msg-meta-chip {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-
-        /* Chat input */
-        .chat-input-row {
-            display: flex;
-            gap: 10px;
-            padding: 16px;
-            border-top: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .chat-input {
-            flex: 1;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 16px;
-            color: var(--text);
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
-            resize: none;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .chat-input:focus {
-            border-color: rgba(102, 126, 234, 0.5);
-        }
-
-        .chat-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .send-btn {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border: none;
-            border-radius: 10px;
-            padding: 12px 20px;
-            color: white;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .send-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Loading dots */
-        .loading-dots {
-            display: inline-flex;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .loading-dots span {
-            width: 6px;
-            height: 6px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: bounce 1.2s infinite ease-in-out;
-        }
-
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            80%,
-            100% {
-                transform: scale(0.6);
-                opacity: 0.4;
-            }
-
-            40% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* ── ARCHITECTURE ── */
-        .arch-section {
-            margin-bottom: 60px;
-        }
-
-        .arch-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .arch-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.2s;
-        }
-
-        .arch-card:hover {
-            border-color: rgba(102, 126, 234, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .arch-layer {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .arch-name {
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 6px;
-        }
-
-        .arch-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .arch-tech {
-            display: inline-block;
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            color: #a5b4fc;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-top: 8px;
-        }
-
-        /* ── PIPELINE ── */
-        .pipeline {
-            display: flex;
-            gap: 0;
-            align-items: center;
-            overflow-x: auto;
-            padding: 20px 0;
-            margin-bottom: 40px;
-        }
-
-        .pipeline-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            min-width: 100px;
-        }
-
-        .pipeline-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--surface);
-            border: 2px solid rgba(102, 126, 234, 0.4);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            position: relative;
-        }
-
-        .pipeline-label {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            text-align: center;
-        }
-
-        .pipeline-arrow {
-            color: rgba(102, 126, 234, 0.4);
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        /* ── FOOTER ── */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 32px 24px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.82rem;
-        }
-
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 640px) {
-            .hero {
-                padding: 48px 16px 40px;
-            }
-
-            .chat-messages {
-                min-height: 280px;
-            }
-
-            .msg-bubble {
-                max-width: 90%;
-            }
-        }
-
-        /* ── API connection strip ── */
+        /* ── API STRIP ── */
         .api-strip {
             border-bottom: 1px solid var(--border);
-            background: rgba(18, 18, 30, 0.95);
+            background: rgba(14, 20, 32, 0.95);
             padding: 10px 0;
             font-size: 0.8rem;
             z-index: 99;
@@ -678,8 +285,9 @@
             background: var(--surface2);
             padding: 4px 10px;
             border-radius: 6px;
-            font-size: 0.78rem;
-            color: #a5b4fc;
+            font-size: 0.75rem;
+            color: #93c5fd;
+            font-family: 'JetBrains Mono', monospace;
             word-break: break-all;
         }
 
@@ -697,18 +305,816 @@
             min-width: 200px;
             padding: 10px 12px;
             border-radius: 8px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border2);
             background: var(--surface);
             color: var(--text);
-            font-family: inherit;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            outline: none;
+        }
+
+        .api-strip-editor input:focus {
+            border-color: var(--accent);
+        }
+
+        /* ── LAYOUT: Two-column main area ── */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+            padding: 32px 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            .market-sidebar {
+                order: -1;
+            }
+        }
+
+        /* ── HERO (compact) ── */
+        .hero-compact {
+            padding: 40px 0 28px;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--teal);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--teal);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.6); }
+        }
+
+        .hero-compact h1 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #ffffff 0%, #93c5fd 45%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            max-width: 560px;
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: border-color 0.2s, transform 0.2s;
+            cursor: default;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── TIPBAR ── */
+        .tipbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(6, 182, 212, 0.07);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.83rem;
+            color: #67e8f9;
+            margin-bottom: 28px;
+        }
+
+        /* ── CHAT SECTION ── */
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-sub {
+            color: var(--text-muted);
+            font-size: 0.83rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* Ticker selector */
+        .ticker-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .ticker-lbl {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .ticker-btn {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--border2);
+            background: var(--surface);
+            color: var(--text);
+            transition: all 0.15s;
+            letter-spacing: 0.5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .ticker-btn:hover,
+        .ticker-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Sample chips */
+        .sample-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .chip {
+            padding: 5px 11px;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+            font-size: 0.74rem;
+            cursor: pointer;
+            color: #93c5fd;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .chip:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.45);
+            transform: translateY(-1px);
+        }
+
+        /* Chat window */
+        .chat-window {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            min-height: 360px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .msg {
+            display: flex;
+            gap: 10px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg.user { flex-direction: row-reverse; }
+
+        .msg-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .msg.user .msg-avatar {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .msg.assistant .msg-avatar {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+        }
+
+        .msg-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            line-height: 1.65;
+        }
+
+        .msg.user .msg-bubble {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            text-align: right;
+        }
+
+        .msg.assistant .msg-bubble {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+        }
+
+        .msg-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .msg-meta-chip {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        /* Chat input */
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            border-top: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 10px;
+            padding: 11px 14px;
+            color: var(--text);
+            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+        }
+
+        .chat-input::placeholder { color: var(--text-muted); }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            border-radius: 10px;
+            padding: 11px 18px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .send-btn:hover { transform: scale(1.06); }
+        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Loading dots */
+        .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ── MARKET SIDEBAR ── */
+        .market-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .market-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .market-card:hover {
+            border-color: var(--border2);
+        }
+
+        .market-card-header {
+            padding: 14px 16px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .market-card-title {
             font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green-tick);
+            animation: pulse-live 2s infinite;
+        }
+
+        @keyframes pulse-live {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+            50% { box-shadow: 0 0 0 5px rgba(52, 211, 153, 0); }
+        }
+
+        .market-card-sub {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        /* BIST-100 Index card */
+        .index-display {
+            padding: 16px;
+        }
+
+        .index-value {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .index-change-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .index-change {
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .index-change.up { color: var(--green-tick); }
+        .index-change.down { color: var(--red-tick); }
+
+        .index-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Mini chart bars (decorative sparkline) */
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 44px;
+            margin-top: 10px;
+        }
+
+        .spark-bar {
+            flex: 1;
+            border-radius: 2px 2px 0 0;
+            background: rgba(59, 130, 246, 0.25);
+            transition: height 0.5s ease;
+        }
+
+        .spark-bar.active {
+            background: linear-gradient(to top, var(--accent), var(--teal));
+        }
+
+        /* Stocks list */
+        .stocks-list {
+            padding: 8px 0;
+        }
+
+        .stock-row {
+            display: flex;
+            align-items: center;
+            padding: 9px 16px;
+            border-bottom: 1px solid rgba(99, 179, 237, 0.06);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .stock-row:last-child { border-bottom: none; }
+
+        .stock-row:hover {
+            background: rgba(59, 130, 246, 0.06);
+        }
+
+        .stock-sym {
+            font-weight: 700;
+            font-size: 0.82rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: #93c5fd;
+            width: 58px;
+            flex-shrink: 0;
+        }
+
+        .stock-name {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .stock-price {
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+            width: 62px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .stock-change {
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            width: 60px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .stock-change.up { color: var(--green-tick); }
+        .stock-change.down { color: var(--red-tick); }
+
+        /* Market summary cards */
+        .market-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 12px;
+        }
+
+        .summary-chip {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .summary-chip-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .summary-chip-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .summary-chip-value.up { color: var(--green-tick); }
+        .summary-chip-value.down { color: var(--red-tick); }
+        .summary-chip-value.neutral { color: var(--gold); }
+
+        /* News feed */
+        .news-feed {
+            padding: 8px 0;
+        }
+
+        .news-item {
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(99, 179, 237, 0.06);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .news-item:last-child { border-bottom: none; }
+
+        .news-item:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .news-ticker-tag {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 4px;
+        }
+
+        .news-headline {
+            font-size: 0.76rem;
+            color: var(--text);
+            line-height: 1.4;
+            margin-bottom: 3px;
+        }
+
+        .news-time {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+        }
+
+        /* Refresh button */
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* ── PIPELINE SECTION ── */
+        .pipeline-section {
+            margin-bottom: 28px;
+        }
+
+        .pipeline {
+            display: flex;
+            gap: 0;
+            align-items: center;
+            overflow-x: auto;
+            padding: 16px 0;
+        }
+
+        .pipeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-width: 88px;
+        }
+
+        .pipeline-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--surface);
+            border: 2px solid rgba(59, 130, 246, 0.35);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .pipeline-label {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .pipeline-arrow {
+            color: rgba(59, 130, 246, 0.35);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        /* ── ARCH CARDS ── */
+        .arch-section {
+            margin-bottom: 28px;
+        }
+
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 12px;
+        }
+
+        .arch-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            transition: all 0.2s;
+        }
+
+        .arch-card:hover {
+            border-color: rgba(59, 130, 246, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .arch-layer {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .arch-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .arch-desc {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .arch-tech {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            color: #93c5fd;
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .hero-compact h1 { font-size: 1.7rem; }
+            .chat-messages { min-height: 260px; max-height: 380px; }
+            .msg-bubble { max-width: 92%; }
+            .main-layout { padding: 20px 16px; gap: 16px; }
+        }
+
+        /* Offline notice */
+        .offline-notice {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.22);
+            border-radius: 10px;
+            padding: 11px 15px;
+            font-size: 0.8rem;
+            color: #fcd34d;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .offline-notice strong { color: #fbbf24; }
+        .offline-notice code {
+            background: rgba(0,0,0,0.3);
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.74rem;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- ── NAV ──────────────────────────────────────────────────── -->
+    <!-- ── NAV ────────────────────────────────────────────────── -->
     <nav>
         <div class="nav-inner">
             <div class="nav-logo">
@@ -716,257 +1122,350 @@
                 <span>BIST Intelligence</span>
                 <span class="badge badge-primary">BETA</span>
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
+            <div class="nav-actions">
+                <span class="badge badge-teal" id="market-status-badge">🇹🇷 BIST Live</span>
                 <span class="badge badge-primary">🚀 AI Powered</span>
-                <a href="http://localhost:8000/docs" target="_blank" class="btn btn-outline"
-                    style="padding:8px 16px; font-size:0.85rem;">API Docs</a>
+                <a href="http://localhost:8000/docs" target="_blank" id="api-docs-link" class="btn btn-outline"
+                    style="padding:7px 14px; font-size:0.8rem;">API Docs</a>
             </div>
         </div>
     </nav>
 
+    <!-- ── LIVE TICKER TAPE ── -->
+    <div class="ticker-tape" id="ticker-tape">
+        <div class="ticker-tape-label">🇹🇷 BIST</div>
+        <div class="ticker-tape-scroll" id="ticker-tape-scroll">
+            <!-- JS filled -->
+        </div>
+    </div>
+
+    <!-- ── API STRIP ── -->
     <div class="api-strip" id="api-strip">
         <div class="container api-strip-inner">
             <span class="api-strip-label">Backend</span>
             <code id="api-base-display">detecting…</code>
             <button type="button" class="btn btn-outline" id="api-config-btn"
-                style="padding:6px 12px;font-size:0.75rem">Change URL</button>
-            <span class="badge badge-primary" id="api-health-pill" style="display:none">API OK</span>
-            <span class="badge badge-warn" id="api-health-bad" style="display:none">Not connected</span>
+                style="padding:5px 10px;font-size:0.73rem">Change URL</button>
+            <span class="badge badge-primary" id="api-health-pill" style="display:none">✅ API OK</span>
+            <span class="badge badge-warn" id="api-health-bad" style="display:none">⚠ Not connected</span>
         </div>
         <div class="container api-strip-editor" id="api-editor" style="display:none">
             <input type="text" id="api-url-input" placeholder="https://your-backend.example.com" autocomplete="off">
-            <button type="button" class="btn btn-primary" style="padding:10px 18px;font-size:0.85rem"
+            <button type="button" class="btn btn-primary" style="padding:9px 16px;font-size:0.82rem"
                 id="api-save-btn">Save &amp; test</button>
         </div>
     </div>
 
-    <!-- ── HERO ──────────────────────────────────────────────────── -->
-    <div class="container">
-        <div class="hero">
-            <div class="hero-eyebrow">🇹🇷 Borsa İstanbul · Türkiye</div>
-            <h1>BIST Equity<br>Intelligence Agent</h1>
-            <p class="hero-subtitle">
-                Agentic RAG system combining KAP official disclosures, Turkish financial news,
-                and brokerage research reports to deliver evidence-based, source-cited, time-aware market intelligence.
-            </p>
-            <div class="hero-cta">
-                <button class="btn btn-primary"
-                    onclick="document.getElementById('chat-section').scrollIntoView({behavior:'smooth'})">
-                    💬 Start Querying
-                </button>
-                <a href="http://localhost:8501" target="_blank" class="btn btn-outline">🖥️ Open Streamlit UI</a>
-                <a href="http://localhost:8000/docs" target="_blank" class="btn btn-outline">📚 API Reference</a>
-            </div>
-        </div>
+    <!-- ── MAIN TWO-COLUMN LAYOUT ── -->
+    <div class="main-layout">
 
-        <div class="disclaimer-banner"
-            style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.2); color: #86efac;">
-            <span class="disclaimer-icon">💡</span>
-            <span><strong>Pro Tip:</strong> You can ask complex questions! Combine KAP data, research reports, and news
-                to uncover hidden market opportunities and deep narrative shifts.
-            </span>
-        </div>
+        <!-- ── LEFT: Chat + Hero + Arch ── -->
+        <div class="left-col">
 
-        <!-- ── STATS ── -->
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-number" id="kap-count">—</div>
-                <div class="stat-label">KAP Disclosures</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="news-count">—</div>
-                <div class="stat-label">News Articles</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="broker-count">—</div>
-                <div class="stat-label">Brokerage Chunks</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">3</div>
-                <div class="stat-label">Data Sources</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">12</div>
-                <div class="stat-label">Eval Questions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">LLM</div>
-                <div class="stat-label">Groq Llama 3.3</div>
-            </div>
-        </div>
-
-        <!-- ── PIPELINE ── -->
-        <div class="arch-section">
-            <div class="section-title">🔄 Agentic Loop</div>
-            <div class="section-sub">retrieve → grade → re-retrieve → answer → guardrail</div>
-            <div class="pipeline">
-                <div class="pipeline-step">
-                    <div class="pipeline-icon">❓</div>
-                    <div class="pipeline-label">User Query</div>
-                </div>
-                <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
-                    <div class="pipeline-icon">🔭</div>
-                    <div class="pipeline-label">Source Router</div>
-                </div>
-                <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
-                    <div class="pipeline-icon">📥</div>
-                    <div class="pipeline-label">Retrieve</div>
-                </div>
-                <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
-                    <div class="pipeline-icon">⚖️</div>
-                    <div class="pipeline-label">Grade Context</div>
-                </div>
-                <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
-                    <div class="pipeline-icon">✏️</div>
-                    <div class="pipeline-label">Rewrite (if needed)</div>
-                </div>
-                <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
-                    <div class="pipeline-icon">🤖</div>
-                    <div class="pipeline-label">Generate Answer</div>
-                </div>
-                <div class="pipeline-arrow">→</div>
-                <div class="pipeline-step">
-                    <div class="pipeline-icon">🛡️</div>
-                    <div class="pipeline-label">Guardrails</div>
+            <!-- Hero -->
+            <div class="hero-compact">
+                <div class="hero-eyebrow">Borsa İstanbul · Real-time Market Intelligence</div>
+                <h1>BIST Equity<br>Intelligence Agent</h1>
+                <p class="hero-subtitle">
+                    Agentic RAG combining KAP official disclosures, Turkish financial news,
+                    and brokerage research to deliver evidence-based, source-cited market analysis.
+                </p>
+                <div class="hero-cta">
+                    <button class="btn btn-primary"
+                        onclick="document.getElementById('chat-section').scrollIntoView({behavior:'smooth'})">
+                        💬 Ask the Agent
+                    </button>
+                    <a href="http://localhost:8501" target="_blank" class="btn btn-outline">🖥️ Streamlit UI</a>
+                    <a href="http://localhost:8000/docs" target="_blank" class="btn btn-outline">📚 API Docs</a>
                 </div>
             </div>
-        </div>
 
-        <!-- ── CHAT ── -->
-        <div class="chat-section" id="chat-section">
-            <div class="section-title">💬 Ask the Agent</div>
-            <div class="section-sub">Select a ticker and ask any BIST market intelligence question — or chat normally (for example hi). If <strong>Backend</strong> shows Not connected, use <strong>Change URL</strong> and save your API base URL.</div>
-
-            <!-- Ticker pills -->
-            <div class="ticker-row" id="ticker-row">
-                <span style="color: var(--text-muted); font-size:0.85rem; align-self:center;">Ticker:</span>
-                <button class="ticker-btn active" data-ticker="" onclick="selectTicker(this)">All</button>
-                <button class="ticker-btn" data-ticker="ASELS" onclick="selectTicker(this)">ASELS</button>
-                <button class="ticker-btn" data-ticker="GARAN" onclick="selectTicker(this)">GARAN</button>
-                <button class="ticker-btn" data-ticker="AKBNK" onclick="selectTicker(this)">AKBNK</button>
-                <button class="ticker-btn" data-ticker="THYAO" onclick="selectTicker(this)">THYAO</button>
-                <button class="ticker-btn" data-ticker="BIMAS" onclick="selectTicker(this)">BIMAS</button>
-                <button class="ticker-btn" data-ticker="EREGL" onclick="selectTicker(this)">EREGL</button>
-                <button class="ticker-btn" data-ticker="KCHOL" onclick="selectTicker(this)">KCHOL</button>
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" id="kap-count">—</div>
+                    <div class="stat-label">KAP Disclosures</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="news-count">—</div>
+                    <div class="stat-label">News Articles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="broker-count">—</div>
+                    <div class="stat-label">Brokerage Chunks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Data Sources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">LLM</div>
+                    <div class="stat-label">Groq Llama 3.3</div>
+                </div>
             </div>
 
-            <!-- Sample questions -->
-            <div class="sample-chips">
-                <span class="chip" onclick="setQuestion(this.textContent)">What KAP disclosures did ASELS make in the
-                    last 6 months?</span>
-                <span class="chip" onclick="setQuestion(this.textContent)">What are the common themes in GARAN research
-                    reports?</span>
-                <span class="chip" onclick="setQuestion(this.textContent)">Is BIMAS news consistent with official KAP
-                    disclosures?</span>
-                <span class="chip" onclick="setQuestion(this.textContent)">How did the narrative around THYAO
-                    change?</span>
-                <span class="chip" onclick="setQuestion(this.textContent)">Latest statements on the Turkish banking
-                    sector</span>
+            <!-- Tip banner -->
+            <div class="tipbar">
+                💡 <span><strong>Pro Tip:</strong> Combine KAP data, research reports, and news for deep narrative
+                    analysis. Try: <em>"Is BIMAS news consistent with official KAP disclosures?"</em></span>
             </div>
 
-            <!-- Chat window -->
-            <div class="chat-window">
-                <div class="chat-messages" id="chat-messages">
-                    <div class="msg assistant">
-                        <div class="msg-avatar">🤖</div>
-                        <div>
-                            <div class="msg-bubble">
-                                Hello! I am the BIST Equity Intelligence Agent. I can provide evidence-based market
-                                intelligence
-                                derived from KAP disclosures, financial news, and brokerage research reports.<br><br>
-                                Select a ticker and type your question. For example:
-                                <em>"What KAP disclosures did ASELS make in the last 6 months?"</em>
-                            </div>
-                            <div class="msg-meta">
-                                <span class="msg-meta-chip">🤖 BIST Intelligence Agent</span>
-                                <span class="msg-meta-chip">⚡ Turbo Inference</span>
+            <!-- ── CHAT ── -->
+            <div id="chat-section" style="margin-bottom:32px;">
+                <div class="section-title">💬 Ask the Agent</div>
+                <div class="section-sub">Select a ticker and ask any BIST market intelligence question. If Backend
+                    shows <em>Not connected</em>, use <strong>Change URL</strong> to set your API base URL.</div>
+
+                <!-- Offline notice (shown when backend not reachable) -->
+                <div class="offline-notice" id="offline-notice" style="display:none">
+                    <span>⚠️</span>
+                    <span>
+                        <strong>Backend not reachable.</strong> The AI agent requires a running FastAPI backend.
+                        Deploy it on Railway, Render, or Fly.io (HTTPS), then click <strong>Change URL</strong> above
+                        and paste your API URL. Owners can also set the <code>BIST_API_BASE_URL</code> GitHub Actions
+                        secret to auto-configure GitHub Pages.
+                    </span>
+                </div>
+
+                <!-- Ticker pills -->
+                <div class="ticker-row" id="ticker-row">
+                    <span class="ticker-lbl">Ticker:</span>
+                    <button class="ticker-btn active" data-ticker="" onclick="selectTicker(this)">All</button>
+                    <button class="ticker-btn" data-ticker="ASELS" onclick="selectTicker(this)">ASELS</button>
+                    <button class="ticker-btn" data-ticker="GARAN" onclick="selectTicker(this)">GARAN</button>
+                    <button class="ticker-btn" data-ticker="AKBNK" onclick="selectTicker(this)">AKBNK</button>
+                    <button class="ticker-btn" data-ticker="THYAO" onclick="selectTicker(this)">THYAO</button>
+                    <button class="ticker-btn" data-ticker="BIMAS" onclick="selectTicker(this)">BIMAS</button>
+                    <button class="ticker-btn" data-ticker="EREGL" onclick="selectTicker(this)">EREGL</button>
+                    <button class="ticker-btn" data-ticker="KCHOL" onclick="selectTicker(this)">KCHOL</button>
+                </div>
+
+                <!-- Sample chips -->
+                <div class="sample-chips">
+                    <span class="chip" onclick="setQuestion(this.textContent)">What KAP disclosures did ASELS make in the last 6 months?</span>
+                    <span class="chip" onclick="setQuestion(this.textContent)">What are the common themes in GARAN research reports?</span>
+                    <span class="chip" onclick="setQuestion(this.textContent)">Is BIMAS news consistent with official KAP disclosures?</span>
+                    <span class="chip" onclick="setQuestion(this.textContent)">How did the narrative around THYAO change?</span>
+                    <span class="chip" onclick="setQuestion(this.textContent)">Latest statements on the Turkish banking sector</span>
+                </div>
+
+                <!-- Chat window -->
+                <div class="chat-window">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="msg assistant">
+                            <div class="msg-avatar">🤖</div>
+                            <div>
+                                <div class="msg-bubble">
+                                    Hello! I am the BIST Equity Intelligence Agent. I can provide evidence-based market
+                                    intelligence derived from KAP disclosures, financial news, and brokerage research
+                                    reports.<br><br>
+                                    Select a ticker and type your question. For example:
+                                    <em>"What KAP disclosures did ASELS make in the last 6 months?"</em>
+                                </div>
+                                <div class="msg-meta">
+                                    <span class="msg-meta-chip">🤖 BIST Intelligence Agent</span>
+                                    <span class="msg-meta-chip">⚡ Groq Turbo</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="chat-input-row">
-                    <textarea class="chat-input" id="chat-input"
-                        placeholder="Ask a question about a BIST company or market event..." rows="2"
-                        onkeydown="handleKey(event)"></textarea>
-                    <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── ARCHITECTURE CARDS ── -->
-        <div class="arch-section">
-            <div class="section-title">🏗️ Technology Stack</div>
-            <div class="section-sub">8-layer architecture from data ingestion to ethical output</div>
-            <div class="arch-grid">
-                <div class="arch-card">
-                    <div class="arch-layer">Level 0 — Deployment</div>
-                    <div class="arch-name">Local / Docker</div>
-                    <div class="arch-desc">Run locally or containerised with Docker Compose</div>
-                    <div class="arch-tech">FastAPI + Docker</div>
-                </div>
-                <div class="arch-card">
-                    <div class="arch-layer">Level 2 — LLM</div>
-                    <div class="arch-name">Groq + Llama 3.3</div>
-                    <div class="arch-desc">Ultra-low latency inference with Turkish language support</div>
-                    <div class="arch-tech">langchain-groq</div>
-                </div>
-                <div class="arch-card">
-                    <div class="arch-layer">Level 3 — Framework</div>
-                    <div class="arch-name">LangChain + LangGraph</div>
-                    <div class="arch-desc">Agentic state machine with conditional retrieval loops</div>
-                    <div class="arch-tech">langgraph==0.2.x</div>
-                </div>
-                <div class="arch-card">
-                    <div class="arch-layer">Level 4 — Vector DB</div>
-                    <div class="arch-name">ChromaDB</div>
-                    <div class="arch-desc">Local vector DB with per-source-type collections</div>
-                    <div class="arch-tech">chromadb==0.5.x</div>
-                </div>
-                <div class="arch-card">
-                    <div class="arch-layer">Level 5 — Embeddings</div>
-                    <div class="arch-name">Multilingual MiniLM</div>
-                    <div class="arch-desc">Turkish-capable sentence transformers, runs on CPU</div>
-                    <div class="arch-tech">sentence-transformers</div>
-                </div>
-                <div class="arch-card">
-                    <div class="arch-layer">Level 6 — Extraction</div>
-                    <div class="arch-name">BS4 + PyMuPDF</div>
-                    <div class="arch-desc">KAP HTML scraper + brokerage PDF parser</div>
-                    <div class="arch-tech">beautifulsoup4 + fitz</div>
-                </div>
-                <div class="arch-card">
-                    <div class="arch-layer">Level 7 — Memory</div>
-                    <div class="arch-name">Conversation History</div>
-                    <div class="arch-desc">In-memory multi-turn context with LangGraph state</div>
-                    <div class="arch-tech">LangGraph State</div>
-                </div>
-                <div class="arch-card">
-                    <div class="arch-layer">Level 8 — Guardrails</div>
-                    <div class="arch-name">Custom Checker</div>
-                    <div class="arch-desc">Pattern-based + LLM guardrails with disclaimer injection</div>
-                    <div class="arch-tech">guardrails/checker.py</div>
+                    <div class="chat-input-row">
+                        <textarea class="chat-input" id="chat-input"
+                            placeholder="Ask a question about a BIST company or market event…" rows="2"
+                            onkeydown="handleKey(event)"></textarea>
+                        <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </div>
+            <!-- ── PIPELINE ── -->
+            <div class="pipeline-section">
+                <div class="section-title">🔄 Agentic Loop</div>
+                <div class="section-sub">retrieve → grade → re-retrieve → answer → guardrail</div>
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">❓</div>
+                        <div class="pipeline-label">User Query</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">🔭</div>
+                        <div class="pipeline-label">Source Router</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">📥</div>
+                        <div class="pipeline-label">Retrieve</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">⚖️</div>
+                        <div class="pipeline-label">Grade Context</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">✏️</div>
+                        <div class="pipeline-label">Rewrite (if needed)</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">🤖</div>
+                        <div class="pipeline-label">Generate Answer</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-step">
+                        <div class="pipeline-icon">🛡️</div>
+                        <div class="pipeline-label">Guardrails</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── ARCH CARDS ── -->
+            <div class="arch-section">
+                <div class="section-title">🏗️ Technology Stack</div>
+                <div class="section-sub">8-layer architecture from data ingestion to ethical output</div>
+                <div class="arch-grid">
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 0 — Deployment</div>
+                        <div class="arch-name">Local / Docker</div>
+                        <div class="arch-desc">Run locally or containerised with Docker Compose</div>
+                        <div class="arch-tech">FastAPI + Docker</div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 2 — LLM</div>
+                        <div class="arch-name">Groq + Llama 3.3</div>
+                        <div class="arch-desc">Ultra-low latency inference with Turkish language support</div>
+                        <div class="arch-tech">langchain-groq</div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 3 — Framework</div>
+                        <div class="arch-name">LangChain + LangGraph</div>
+                        <div class="arch-desc">Agentic state machine with conditional retrieval loops</div>
+                        <div class="arch-tech">langgraph==0.2.x</div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 4 — Vector DB</div>
+                        <div class="arch-name">ChromaDB</div>
+                        <div class="arch-desc">Local vector DB with per-source-type collections</div>
+                        <div class="arch-tech">chromadb==0.5.x</div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 5 — Embeddings</div>
+                        <div class="arch-name">Multilingual MiniLM</div>
+                        <div class="arch-desc">Turkish-capable sentence transformers, runs on CPU</div>
+                        <div class="arch-tech">sentence-transformers</div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 6 — Extraction</div>
+                        <div class="arch-name">BS4 + PyMuPDF</div>
+                        <div class="arch-desc">KAP HTML scraper + brokerage PDF parser</div>
+                        <div class="arch-tech">beautifulsoup4 + fitz</div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 7 — Memory</div>
+                        <div class="arch-name">Conversation History</div>
+                        <div class="arch-desc">In-memory multi-turn context with LangGraph state</div>
+                        <div class="arch-tech">LangGraph State</div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-layer">Level 8 — Guardrails</div>
+                        <div class="arch-name">Custom Checker</div>
+                        <div class="arch-desc">Pattern-based + LLM guardrails with disclaimer injection</div>
+                        <div class="arch-tech">guardrails/checker.py</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /left-col -->
+
+        <!-- ── RIGHT: Market Intelligence Sidebar ── -->
+        <aside class="market-sidebar">
+
+            <!-- BIST-100 Index -->
+            <div class="market-card">
+                <div class="market-card-header">
+                    <div class="market-card-title">
+                        <div class="live-dot"></div>
+                        BIST-100 Index
+                    </div>
+                    <button class="refresh-btn" onclick="refreshMarketData()" id="refresh-btn" title="Refresh">
+                        <span id="refresh-icon">↻</span> Refresh
+                    </button>
+                </div>
+                <div class="index-display">
+                    <div class="index-value" id="bist100-value">9,842.36</div>
+                    <div class="index-change-row">
+                        <span class="index-change up" id="bist100-change">▲ +127.48 (+1.31%)</span>
+                    </div>
+                    <div class="index-label">BIST-100 · TRY · <span id="market-time">—</span></div>
+                    <div class="sparkline" id="sparkline">
+                        <!-- JS filled -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Summary -->
+            <div class="market-card">
+                <div class="market-card-header">
+                    <div class="market-card-title">📊 Market Summary</div>
+                    <div class="market-card-sub" id="summary-time">—</div>
+                </div>
+                <div class="market-summary-grid">
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">Advances</div>
+                        <div class="summary-chip-value up" id="sum-advances">—</div>
+                    </div>
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">Declines</div>
+                        <div class="summary-chip-value down" id="sum-declines">—</div>
+                    </div>
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">Volume (₺B)</div>
+                        <div class="summary-chip-value neutral" id="sum-volume">—</div>
+                    </div>
+                    <div class="summary-chip">
+                        <div class="summary-chip-label">USD/TRY</div>
+                        <div class="summary-chip-value" id="sum-usd" style="color: var(--text)">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top BIST Stocks -->
+            <div class="market-card">
+                <div class="market-card-header">
+                    <div class="market-card-title">📈 Key BIST Stocks</div>
+                    <div class="market-card-sub">Click to query agent</div>
+                </div>
+                <div class="stocks-list" id="stocks-list">
+                    <!-- JS filled -->
+                </div>
+            </div>
+
+            <!-- Market Intelligence News -->
+            <div class="market-card">
+                <div class="market-card-header">
+                    <div class="market-card-title">📰 Market Intelligence</div>
+                    <div class="market-card-sub">Live context</div>
+                </div>
+                <div class="news-feed" id="news-feed">
+                    <!-- JS filled -->
+                </div>
+            </div>
+
+        </aside><!-- /market-sidebar -->
+
+    </div><!-- /main-layout -->
 
     <!-- ── FOOTER ── -->
     <footer>
         <p>
             BIST Equity Intelligence Agent &nbsp;•&nbsp;
-            Powered by <a href="https://openai.com">OpenAI</a> /
-            <a href="https://groq.com">Groq</a> +
-            <a href="https://www.langchain.com">LangChain</a> +
-            <a href="https://www.trychroma.com">ChromaDB</a>
+            Powered by <a href="https://groq.com" target="_blank">Groq</a> +
+            <a href="https://www.langchain.com" target="_blank">LangChain</a> +
+            <a href="https://www.trychroma.com" target="_blank">ChromaDB</a>
         </p>
-        <p style="margin-top:8px;">
-            ✨ Uncover the alpha in the Turkish equity markets.
+        <p style="margin-top:8px; color: var(--text-dim);">
+            ✨ Uncover the alpha in Turkish equity markets.
         </p>
     </footer>
 
@@ -974,50 +1473,232 @@
         let API_BASE = '';
         let selectedTicker = '';
 
-        function pageIsHttps() {
-            return location.protocol === 'https:';
+        // ── MARKET DATA (simulated with realistic BIST data, auto-refreshed) ──
+        // Because live BIST data requires a paid API or backend proxy to avoid CORS,
+        // we use a realistic simulated feed with randomized intraday drift.
+        // Connect to your backend's /market endpoint to replace with live data.
+
+        const BIST_STOCKS = [
+            { sym: 'ASELS', name: 'Aselsan', price: 62.45, chg: +2.18 },
+            { sym: 'GARAN', name: 'Garanti Bankası', price: 148.70, chg: +1.45 },
+            { sym: 'AKBNK', name: 'Akbank', price: 57.30, chg: -0.87 },
+            { sym: 'THYAO', name: 'Türk Hava Yolları', price: 312.50, chg: +3.21 },
+            { sym: 'BIMAS', name: 'BIM Birleşik Mağazalar', price: 456.80, chg: -1.12 },
+            { sym: 'EREGL', name: 'Ereğli Demir Çelik', price: 43.72, chg: +0.55 },
+            { sym: 'KCHOL', name: 'Koç Holding', price: 198.40, chg: +1.78 },
+            { sym: 'SISE',  name: 'Şişecam', price: 29.86, chg: -2.04 },
+            { sym: 'TUPRS', name: 'Tüpraş', price: 198.90, chg: +0.92 },
+            { sym: 'YKBNK', name: 'Yapı Kredi Bankası', price: 25.14, chg: -0.31 },
+        ];
+
+        const SAMPLE_NEWS = [
+            { ticker: 'THYAO', headline: 'Turkish Airlines announces record Q1 passenger numbers, up 14% YoY', time: '2m ago' },
+            { ticker: 'GARAN', headline: 'Garanti BBVA reports strong NIM expansion; raises guidance for 2026', time: '18m ago' },
+            { ticker: 'ASELS', headline: 'Aselsan wins ₺2.1B defense contract from Ministry of National Defense', time: '35m ago' },
+            { ticker: 'BIMAS', headline: 'BIM same-store sales growth accelerates to 38% amid persistent inflation', time: '52m ago' },
+            { ticker: 'EREGL', headline: 'Ereğli steel volumes recover; European demand stabilizes in Q2', time: '1h ago' },
+            { ticker: 'AKBNK', headline: 'CBRT holds rates steady; banking sector NPL ratio inches lower', time: '2h ago' },
+        ];
+
+        const SPARKLINE_HEIGHTS = [28, 32, 30, 38, 35, 42, 40, 44, 38, 41, 39, 44];
+
+        function fmt(n, dec = 2) { return n.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+        function fmtPrice(n) { return fmt(n, 2); }
+        function sign(n) { return n >= 0 ? '+' : ''; }
+
+        function driftPrice(base, pct) {
+            const drift = (Math.random() - 0.49) * 0.3;
+            return Math.max(base * 0.7, base + drift);
         }
 
-        function pageIsFile() {
-            return location.protocol === 'file:';
+        function marketIsOpen() {
+            const now = new Date();
+            const h = now.getHours(), m = now.getMinutes();
+            const minSinceMidnight = h * 60 + m;
+            // BIST: 10:00–18:10 Turkish time (UTC+3)
+            const turkishOffset = 3 * 60;
+            const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+            const tMin = (utcMin + turkishOffset) % (24 * 60);
+            return tMin >= 600 && tMin <= 1090;
         }
 
-        /** True if base URL is this exact website (GitHub Pages cannot host POST /query — always 405). */
+        function buildTickerTape(stocks) {
+            const tape = document.getElementById('ticker-tape-scroll');
+            if (!tape) return;
+            // Duplicate for seamless scroll
+            let html = '';
+            for (let rep = 0; rep < 2; rep++) {
+                stocks.forEach(s => {
+                    const up = s.chg >= 0;
+                    const dir = up ? '▲' : '▼';
+                    const cls = up ? 'up' : 'down';
+                    html += `<div class="ticker-item">
+                        <span class="t-symbol">${s.sym}</span>
+                        <span class="t-price">${fmtPrice(s.price)}</span>
+                        <span class="t-change ${cls}">${dir} ${sign(s.chg)}${fmt(s.chg)}&nbsp;(${sign(s.chg)}${fmt(Math.abs(s.chg / (s.price - s.chg) * 100))}%)</span>
+                    </div>`;
+                });
+            }
+            tape.innerHTML = html;
+        }
+
+        function buildStocksList(stocks) {
+            const el = document.getElementById('stocks-list');
+            if (!el) return;
+            el.innerHTML = stocks.map(s => {
+                const up = s.chg >= 0;
+                const dir = up ? '▲' : '▼';
+                const cls = up ? 'up' : 'down';
+                const pct = ((s.chg / (s.price - s.chg)) * 100);
+                return `<div class="stock-row" onclick="askAbout('${s.sym}')">
+                    <span class="stock-sym">${s.sym}</span>
+                    <span class="stock-name">${s.name}</span>
+                    <span class="stock-price">₺${fmtPrice(s.price)}</span>
+                    <span class="stock-change ${cls}">${dir} ${sign(pct)}${fmt(Math.abs(pct))}%</span>
+                </div>`;
+            }).join('');
+        }
+
+        function buildNewsFeed(news) {
+            const el = document.getElementById('news-feed');
+            if (!el) return;
+            el.innerHTML = news.map(n => `
+                <div class="news-item" onclick="setQuestion('${n.headline.replace(/'/g, "\\'")}')">
+                    <div class="news-ticker-tag">${n.ticker}</div>
+                    <div class="news-headline">${n.headline}</div>
+                    <div class="news-time">🕐 ${n.time}</div>
+                </div>`).join('');
+        }
+
+        function buildSparkline(heights) {
+            const el = document.getElementById('sparkline');
+            if (!el) return;
+            const max = Math.max(...heights);
+            el.innerHTML = heights.map((h, i) => {
+                const pct = (h / max * 100).toFixed(1);
+                const isLast = i === heights.length - 1;
+                return `<div class="spark-bar ${isLast ? 'active' : ''}" style="height:${pct}%"></div>`;
+            }).join('');
+        }
+
+        function updateIndexDisplay(stocks) {
+            // Weighted simulated BIST-100 value based on larger caps
+            const base = 9842.36;
+            const drift = (Math.random() - 0.48) * 15;
+            const val = base + drift;
+            const chgPts = drift;
+            const chgPct = (drift / base * 100);
+            const up = chgPts >= 0;
+
+            const valEl = document.getElementById('bist100-value');
+            const chgEl = document.getElementById('bist100-change');
+            if (valEl) valEl.textContent = fmt(val, 2);
+            if (chgEl) {
+                chgEl.className = `index-change ${up ? 'up' : 'down'}`;
+                chgEl.textContent = `${up ? '▲' : '▼'} ${sign(chgPts)}${fmt(Math.abs(chgPts))} (${sign(chgPct)}${fmt(Math.abs(chgPct))}%)`;
+            }
+            const timeEl = document.getElementById('market-time');
+            if (timeEl) {
+                const now = new Date();
+                timeEl.textContent = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) + (marketIsOpen() ? ' • Open' : ' • Closed');
+            }
+        }
+
+        function updateMarketSummary() {
+            const advances = Math.floor(Math.random() * 80) + 200;
+            const declines = Math.floor(Math.random() * 80) + 130;
+            const vol = (Math.random() * 20 + 65).toFixed(1);
+            const usd = (38.2 + (Math.random() - 0.5) * 0.5).toFixed(4);
+
+            const el = id => document.getElementById(id);
+            if (el('sum-advances')) el('sum-advances').textContent = advances;
+            if (el('sum-declines')) el('sum-declines').textContent = declines;
+            if (el('sum-volume')) el('sum-volume').textContent = vol;
+            if (el('sum-usd')) el('sum-usd').textContent = usd;
+
+            const st = el('summary-time');
+            if (st) {
+                const now = new Date();
+                st.textContent = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        }
+
+        function refreshMarketData() {
+            const icon = document.getElementById('refresh-icon');
+            if (icon) icon.classList.add('spinning');
+
+            // Drift stock prices
+            BIST_STOCKS.forEach(s => {
+                s.chg += (Math.random() - 0.485) * 0.4;
+                s.price = s.price + (Math.random() - 0.485) * 0.8;
+            });
+
+            buildTickerTape(BIST_STOCKS);
+            buildStocksList(BIST_STOCKS);
+            updateIndexDisplay(BIST_STOCKS);
+            updateMarketSummary();
+
+            // Shift sparkline
+            SPARKLINE_HEIGHTS.shift();
+            SPARKLINE_HEIGHTS.push(Math.floor(Math.random() * 20) + 28);
+            buildSparkline(SPARKLINE_HEIGHTS);
+
+            setTimeout(() => {
+                if (icon) icon.classList.remove('spinning');
+            }, 600);
+        }
+
+        function initMarket() {
+            buildTickerTape(BIST_STOCKS);
+            buildStocksList(BIST_STOCKS);
+            buildSparkline(SPARKLINE_HEIGHTS);
+            buildNewsFeed(SAMPLE_NEWS);
+            updateIndexDisplay(BIST_STOCKS);
+            updateMarketSummary();
+
+            // Update market data every 20 seconds
+            setInterval(refreshMarketData, 20000);
+        }
+
+        function askAbout(ticker) {
+            // Select ticker tab
+            document.querySelectorAll('.ticker-btn').forEach(b => {
+                if (b.dataset.ticker === ticker) {
+                    selectTicker(b);
+                }
+            });
+            const input = document.getElementById('chat-input');
+            if (input) {
+                input.value = `What are the latest KAP disclosures and analyst views for ${ticker}?`;
+                input.focus();
+            }
+            document.getElementById('chat-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ── API CONNECTION LOGIC ──
+        function pageIsHttps() { return location.protocol === 'https:'; }
+        function pageIsFile() { return location.protocol === 'file:'; }
+
         function apiBaseIsThisDocumentSite(base) {
             const b = normalizeApiBase(base);
             if (!b) return false;
-            try {
-                return new URL(b).origin === location.origin;
-            } catch (_) {
-                return false;
-            }
+            try { return new URL(b).origin === location.origin; } catch (_) { return false; }
         }
 
         function fallbackBasesForFetch() {
             const list = [];
-            if (normalizeApiBase(API_BASE) && !apiBaseIsThisDocumentSite(API_BASE)) {
-                list.push(API_BASE);
-            }
-            if (!pageIsHttps()) {
-                list.push('http://127.0.0.1:8000', 'http://localhost:8000');
-            }
-            if (!pageIsFile() && !pageIsHttps()) {
-                list.push(location.origin);
-            }
+            if (normalizeApiBase(API_BASE) && !apiBaseIsThisDocumentSite(API_BASE)) list.push(API_BASE);
+            if (!pageIsHttps()) list.push('http://127.0.0.1:8000', 'http://localhost:8000');
+            if (!pageIsFile() && !pageIsHttps()) list.push(location.origin);
             return uniqueBases(list);
         }
 
-        /** Statuses that mean "this host is not the FastAPI app" — try the next candidate base. */
-        function shouldTryNextApiBase(status) {
-            return status === 404 || status === 405 || status === 501;
-        }
+        function shouldTryNextApiBase(status) { return status === 404 || status === 405 || status === 501; }
 
         function normalizeApiBase(u) {
             let s = String(u || '').trim().replace(/\/$/, '');
             if (!s) return '';
-            if (!/^https?:\/\//i.test(s)) {
-                s = (pageIsHttps() ? 'https://' : 'http://') + s;
-            }
+            if (!/^https?:\/\//i.test(s)) s = (pageIsHttps() ? 'https://' : 'http://') + s;
             return s;
         }
 
@@ -1035,10 +1716,7 @@
                 const r = await fetch(`${b}/health`, { method: 'GET', signal });
                 cancel();
                 return r.ok;
-            } catch (_) {
-                cancel();
-                return false;
-            }
+            } catch (_) { cancel(); return false; }
         }
 
         async function discoverApiBase() {
@@ -1051,9 +1729,7 @@
             if (fromQuery) candidates.push(normalizeApiBase(fromQuery));
             if (fromMeta) candidates.push(normalizeApiBase(fromMeta));
             if (saved) candidates.push(normalizeApiBase(saved));
-            if (!pageIsHttps()) {
-                candidates.push('http://127.0.0.1:8000', 'http://localhost:8000');
-            }
+            if (!pageIsHttps()) candidates.push('http://127.0.0.1:8000', 'http://localhost:8000');
             if (!pageIsHttps() && !pageIsFile()) candidates.push(location.origin);
 
             const seen = new Set();
@@ -1064,18 +1740,15 @@
                 if (await probeHealth(c)) return c;
             }
             if (pageIsHttps()) return '';
-            if (pageIsFile()) return 'http://127.0.0.1:8000';
             return 'http://127.0.0.1:8000';
         }
 
         function uniqueBases(list) {
-            const out = [];
-            const seen = new Set();
+            const out = []; const seen = new Set();
             for (const x of list) {
                 const b = normalizeApiBase(x);
                 if (!b || seen.has(b)) continue;
-                seen.add(b);
-                out.push(b);
+                seen.add(b); out.push(b);
             }
             return out;
         }
@@ -1097,13 +1770,9 @@
                     }
                     if (shouldTryNextApiBase(resp.status)) continue;
                     return resp;
-                } catch (_) {
-                    /* wrong host, mixed content, or server down — try next */
-                }
+                } catch (_) { /* wrong host, mixed content, or server down */ }
             }
-            if (lastResp && !lastResp.ok && shouldTryNextApiBase(lastResp.status)) {
-                return null;
-            }
+            if (lastResp && !lastResp.ok && shouldTryNextApiBase(lastResp.status)) return null;
             return lastResp;
         }
 
@@ -1118,14 +1787,19 @@
         function refreshApiUi() {
             const el = document.getElementById('api-base-display');
             if (el) el.textContent = API_BASE || '(not set)';
+            // Update API Docs link
+            const docsLink = document.getElementById('api-docs-link');
+            if (docsLink && API_BASE) docsLink.href = `${API_BASE}/docs`;
         }
 
         async function verifyApiAndUpdatePills() {
             const ok = normalizeApiBase(API_BASE) ? await probeHealth(API_BASE) : false;
             const good = document.getElementById('api-health-pill');
             const bad = document.getElementById('api-health-bad');
-            if (good) { good.style.display = ok ? 'inline-flex' : 'none'; }
-            if (bad) { bad.style.display = ok ? 'none' : 'inline-flex'; }
+            const offlineNotice = document.getElementById('offline-notice');
+            if (good) good.style.display = ok ? 'inline-flex' : 'none';
+            if (bad) bad.style.display = ok ? 'none' : 'inline-flex';
+            if (offlineNotice) offlineNotice.style.display = ok ? 'none' : 'flex';
             return ok;
         }
 
@@ -1135,10 +1809,7 @@
             if (!ed || !input) return;
             const show = ed.style.display === 'none';
             ed.style.display = show ? 'flex' : 'none';
-            if (show) {
-                input.value = API_BASE;
-                input.focus();
-            }
+            if (show) { input.value = API_BASE; input.focus(); }
         });
 
         document.getElementById('api-save-btn')?.addEventListener('click', async () => {
@@ -1163,16 +1834,19 @@
         });
 
         (async function boot() {
+            // Init market data immediately (no API needed)
+            initMarket();
+
             try {
                 const prev = localStorage.getItem('BIST_API_BASE');
                 if (pageIsHttps() && prev && apiBaseIsThisDocumentSite(prev)) {
                     localStorage.removeItem('BIST_API_BASE');
                 }
             } catch (_) { }
+
             API_BASE = await discoverApiBase();
-            if (pageIsHttps() && apiBaseIsThisDocumentSite(API_BASE)) {
-                API_BASE = '';
-            }
+            if (pageIsHttps() && apiBaseIsThisDocumentSite(API_BASE)) API_BASE = '';
+
             if (normalizeApiBase(API_BASE) && await probeHealth(API_BASE)) {
                 try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
             }
@@ -1181,28 +1855,23 @@
             loadStats();
         })();
 
-        // ── Ticker selection ──────────────────────────────────────
+        // ── TICKER SELECTION ──
         function selectTicker(btn) {
             document.querySelectorAll('.ticker-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedTicker = btn.dataset.ticker;
         }
 
-        // ── Set question from chip ────────────────────────────────
         function setQuestion(text) {
             document.getElementById('chat-input').value = text;
             document.getElementById('chat-input').focus();
         }
 
-        // ── Handle Enter key ──────────────────────────────────────
         function handleKey(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
         }
 
-        // ── Append message ────────────────────────────────────────
+        // ── APPEND MESSAGE ──
         function appendMessage(role, content, meta = null) {
             const container = document.getElementById('chat-messages');
             const div = document.createElement('div');
@@ -1213,7 +1882,6 @@
             avatar.textContent = role === 'user' ? '👤' : '🤖';
 
             const inner = document.createElement('div');
-
             const bubble = document.createElement('div');
             bubble.className = 'msg-bubble';
             bubble.innerHTML = content.replace(/\n/g, '<br>');
@@ -1223,10 +1891,10 @@
                 const metaDiv = document.createElement('div');
                 metaDiv.className = 'msg-meta';
                 const chips = [
-                    meta.sources_used?.length ? `📚 Sources: ${meta.sources_used.join(', ')}` : null,
+                    meta.sources_used?.length ? `📚 ${meta.sources_used.join(', ')}` : null,
                     meta.iteration_count !== undefined ? `🔄 Iterations: ${meta.iteration_count}` : null,
                     meta.grader_confidence !== undefined ? `📊 Confidence: ${(meta.grader_confidence * 100).toFixed(0)}%` : null,
-                    meta.answer_type ? `🎯 Type: ${meta.answer_type}` : null,
+                    meta.answer_type ? `🎯 ${meta.answer_type}` : null,
                 ].filter(Boolean);
                 chips.forEach(c => {
                     const span = document.createElement('span');
@@ -1243,7 +1911,6 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // ── Loading indicator ─────────────────────────────────────
         function showLoading() {
             const container = document.getElementById('chat-messages');
             const div = document.createElement('div');
@@ -1251,8 +1918,8 @@
             div.id = 'loading-msg';
             div.innerHTML = `
             <div class="msg-avatar">🤖</div>
-            <div class="msg-bubble">
-                <span style="color:var(--text-muted)">Searching KAP, news, and brokerage reports</span>
+            <div class="msg-bubble" style="background:var(--surface2);border:1px solid var(--border)">
+                <span style="color:var(--text-muted);font-size:0.82rem;">Searching KAP, news &amp; brokerage reports</span>
                 <span class="loading-dots"><span></span><span></span><span></span></span>
             </div>`;
             container.appendChild(div);
@@ -1264,7 +1931,7 @@
             if (el) el.remove();
         }
 
-        // ── Send message ──────────────────────────────────────────
+        // ── SEND MESSAGE ──
         async function sendMessage() {
             const input = document.getElementById('chat-input');
             const question = input.value.trim();
@@ -1272,23 +1939,17 @@
 
             input.value = '';
             document.getElementById('send-btn').disabled = true;
-
             appendMessage('user', question);
             showLoading();
 
             try {
-                const resp = await postQueryJson({
-                    question,
-                    ticker: selectedTicker,
-                    chat_history: [],
-                });
-
+                const resp = await postQueryJson({ question, ticker: selectedTicker, chat_history: [] });
                 removeLoading();
 
                 if (!resp || !resp.ok) {
                     let detail = '';
                     if (!resp) {
-                        detail = 'No FastAPI backend is reachable from this page. Deploy the API with HTTPS (e.g. Railway, Render, Fly.io), then use <strong>Change URL</strong> and <strong>Save &amp; test</strong> with that base URL. Repository owners can also set the <code>BIST_API_BASE_URL</code> Actions secret so GitHub Pages embeds it automatically.';
+                        detail = `No FastAPI backend is reachable. Deploy the API with HTTPS (Railway, Render, Fly.io) then use <strong>Change URL</strong> above to connect. GitHub Pages owners can set the <code>BIST_API_BASE_URL</code> Actions secret to auto-configure.`;
                     } else {
                         detail = (resp.statusText || '').trim();
                         try {
@@ -1298,10 +1959,10 @@
                                     ? err.detail.map(e => e.msg || e.type || JSON.stringify(e)).join(' ')
                                     : String(err.detail);
                             }
-                        } catch (_) { /* non-JSON body */ }
+                        } catch (_) { }
                         if (!detail) detail = `Request failed (HTTP ${resp.status}).`;
                     }
-                    appendMessage('assistant', `❌ ${detail}`);
+                    appendMessage('assistant', `⚠️ ${detail}`);
                     verifyApiAndUpdatePills();
                     return;
                 }
@@ -1317,7 +1978,7 @@
             } catch (err) {
                 removeLoading();
                 appendMessage('assistant',
-                    '❌ The request did not complete. Use <strong>Change URL</strong> to set a reachable API base URL (HTTPS if this page is HTTPS), then <strong>Save &amp; test</strong>.'
+                    '⚠️ Request did not complete. Use <strong>Change URL</strong> to set a reachable API base URL (HTTPS if this page is HTTPS), then <strong>Save &amp; test</strong>.'
                 );
                 verifyApiAndUpdatePills();
             } finally {
@@ -1325,19 +1986,17 @@
             }
         }
 
-        // ── Load stats ────────────────────────────────────────────
+        // ── LOAD STATS ──
         async function loadStats() {
             try {
                 const resp = await fetchFromApiBest('/stats', { method: 'GET' });
                 if (!resp || !resp.ok) return;
                 const data = await resp.json();
                 const cols = data.collections || {};
-                document.getElementById('kap-count').textContent =
-                    cols['kap_disclosures'] ?? '—';
-                document.getElementById('news-count').textContent =
-                    cols['financial_news'] ?? '—';
-                document.getElementById('broker-count').textContent =
-                    cols['brokerage_reports'] ?? '—';
+                const el = id => document.getElementById(id);
+                if (el('kap-count')) el('kap-count').textContent = cols['kap_disclosures'] ?? '—';
+                if (el('news-count')) el('news-count').textContent = cols['financial_news'] ?? '—';
+                if (el('broker-count')) el('broker-count').textContent = cols['brokerage_reports'] ?? '—';
             } catch {
                 // API not running — silently ignore
             }
