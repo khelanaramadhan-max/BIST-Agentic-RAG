@@ -1,0 +1,44 @@
+# ─── Core LLM & Agent Framework ──────────────────────────────
+# NOTE: Using flexible version ranges to support Python 3.14
+langchain>=0.3.0,<0.4.0
+langchain-groq>=0.2.0
+langchain-community>=0.3.0,<0.4.0
+langchain-chroma>=0.2.0
+langgraph>=0.2.0
+
+# ─── Vector DB ────────────────────────────────────────────────
+chromadb>=0.5.0
+
+# ─── Embeddings ───────────────────────────────────────────────
+sentence-transformers>=3.0.0
+
+# ─── PDF Parsing ──────────────────────────────────────────────
+pymupdf>=1.24.0
+pdfplumber>=0.10.0
+
+# ─── Web Scraping ─────────────────────────────────────────────
+requests>=2.28.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+httpx>=0.25.0
+
+# ─── FastAPI ──────────────────────────────────────────────────
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# ─── Streamlit UI ─────────────────────────────────────────────
+streamlit>=1.30.0
+
+# ─── Data & Utils ─────────────────────────────────────────────
+python-dotenv>=1.0.0
+pandas>=2.0.0
+numpy>=1.26.0
+tqdm>=4.65.0
+tenacity>=8.0.0
+feedparser>=6.0.0
+python-dateutil>=2.8.0
+
+# ─── Integrations ─────────────────────────────────────────────
+supabase>=2.0.0

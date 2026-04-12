@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  # ── FastAPI Backend ──────────────────────────────────────────
+  api:
+    build: .
+    container_name: bist-rag-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data          # Persist ChromaDB & raw data
+      - ./.env:/app/.env          # Mount your .env file
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  # ── Streamlit UI ─────────────────────────────────────────────
+  ui:
+    build: .
+    container_name: bist-rag-ui
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: streamlit run ui/app.py --server.address 0.0.0.0 --server.port 8501
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  bist_data:
