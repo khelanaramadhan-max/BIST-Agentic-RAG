@@ -64,13 +64,9 @@ class Settings(BaseSettings):
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
-    @model_validator(mode="after")
-    def _require_any_llm_key(self):
-        if not (self.groq_api_key or self.openai_api_key):
-            raise ValueError(
-                "Set GROQ_API_KEY and/or OPENAI_API_KEY in your .env file (at least one is required)."
-            )
-        return self
+    # Removed strict @model_validator for API keys so cloud deployments (Render/Railway) 
+    # don't crash on boot before the user has a chance to set the environment variable.
+    # We will rely on LangChain's native validation when the LLM is actually invoked.
 
     def use_openai(self) -> bool:
         p = (self.llm_provider or "auto").strip().lower()
