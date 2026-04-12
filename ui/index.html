@@ -1731,7 +1731,7 @@
         function fallbackBasesForFetch() {
             const list = [];
             if (normalizeApiBase(API_BASE) && !apiBaseIsThisDocumentSite(API_BASE)) list.push(API_BASE);
-            if (!pageIsHttps()) list.push('http://127.0.0.1:8000', 'http://localhost:8000');
+            if (!pageIsHttps()) list.push('http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:8000', 'http://localhost:8000');
             if (!pageIsFile() && !pageIsHttps()) list.push(location.origin);
             return uniqueBases(list);
         }
@@ -1772,7 +1772,7 @@
             if (fromQuery) candidates.push(normalizeApiBase(fromQuery));
             if (fromMeta) candidates.push(normalizeApiBase(fromMeta));
             if (saved) candidates.push(normalizeApiBase(saved));
-            if (!pageIsHttps()) candidates.push('http://127.0.0.1:8000', 'http://localhost:8000');
+            if (!pageIsHttps()) candidates.push('http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:8000', 'http://localhost:8000');
             if (!pageIsHttps() && !pageIsFile()) candidates.push(location.origin);
 
             const seen = new Set();
