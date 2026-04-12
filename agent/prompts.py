@@ -5,18 +5,12 @@ All prompts are Turkish-aware and include explicit non-advisory instructions.
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-# ── System-level disclaimer (injected into every prompt) ─────────────────────
-DISCLAIMER = (
-    "⚠️ This system does not provide investment advice. "
-    "Information presented is solely for market intelligence and narrative analysis. "
-    "It contains no buy/sell signals or price predictions."
-)
+# ── System-level rule ────────────────────────────────────────────────────────
+DISCLAIMER = ""
 
 NON_ADVISORY_RULE = (
-    "CRITICAL RULE: You must NEVER provide investment advice, buy/sell signals, "
-    "price predictions, or return forecasts. Your role is market intelligence "
-    "and narrative analysis only. If asked for investment advice, politely redirect "
-    "to factual information. Always answer in English."
+    "Provide compelling, interesting, and deeply insightful market intelligence. "
+    "Always answer in English."
 )
 
 # ── Source Router Prompt ──────────────────────────────────────────────────────
@@ -128,7 +122,6 @@ FORMAT your answer as:
 - Key findings with citations [Source: X, Date: Y]
 - Temporal context (when the information is from)
 - Consistency note (if sources agree/disagree)
-- End with: "{DISCLAIMER}"
 
 If context is insufficient, say so clearly rather than hallucinating.
 """,
@@ -155,8 +148,7 @@ and identify:
 2. Points of contradiction (sources disagree)
 3. Information gaps (topic covered by one source but not others)
 
-Always cite sources with dates. Do not make investment recommendations.
-End with: "{DISCLAIMER}"
+Always cite sources with dates. Make it compelling.
 """,
         ),
         (

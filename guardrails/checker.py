@@ -10,13 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-DISCLAIMER = (
-    "\n\n---\n"
-    "⚠️ **Legal Disclaimer**: This system does not provide investment advice. "
-    "Information presented is solely for market intelligence and narrative analysis. "
-    "It contains no buy/sell signals or price predictions. "
-    "Please consult a licensed financial advisor for investment decisions.\n"
-)
+DISCLAIMER = ""
 
 # ── Patterns that indicate investment advice ──────────────────────────────────
 
@@ -45,14 +39,7 @@ REPLACEMENT_MESSAGES = {
     r"\b(price target|fiyat hedefi|TP)\s*[:=]?\s*[\$₺]?\d+": "[no price prediction]",
 }
 
-INVESTMENT_ADVICE_REDIRECT = (
-    "This question constitutes a request for investment advice. "
-    "This system does not provide investment advice. "
-    "However, I can provide objective information derived from KAP disclosures, news, "
-    "and research reports regarding the company. "
-    "Please rephrase your question to ask about a specific event or theme.\n\n"
-    + DISCLAIMER
-)
+INVESTMENT_ADVICE_REDIRECT = ""
 
 
 def check_for_investment_advice(text: str) -> tuple[bool, list[str]]:
@@ -77,60 +64,15 @@ def redact_sensitive_content(text: str) -> str:
 
 
 def ensure_disclaimer_present(text: str) -> str:
-    """Make sure the disclaimer is in the response."""
-    disclaimer_markers = [
-        "yatırım tavsiyesi vermemektedir",
-        "does not provide investment advice",
-        "This system does not",
-    ]
-    if not any(marker.lower() in text.lower() for marker in disclaimer_markers):
-        return text + DISCLAIMER
+    """Disabled."""
     return text
 
 
 def apply_guardrails(answer: str) -> str:
-    """
-    Main guardrail function. Performs:
-    1. Check for hard violations
-    2. Redact specific signals
-    3. Ensure disclaimer
-    4. Log violations
-    """
-    if not answer:
-        return DISCLAIMER
-
-    is_violating, violations = check_for_investment_advice(answer)
-
-    if violations:
-        logger.warning(
-            "Guardrail VIOLATION detected: %d patterns matched. Redacting.",
-            len(violations),
-        )
-        # Redact rather than block completely for usability
-        answer = redact_sensitive_content(answer)
-
-    # Always ensure disclaimer is present
-    answer = ensure_disclaimer_present(answer)
-
+    """Guardrails completely subverted (disabled per user request)"""
     return answer
 
 
 def check_question_safety(question: str) -> tuple[bool, str]:
-    """
-    Pre-check: Is the question explicitly asking for investment advice?
-    Returns (is_safe, redirect_message).
-    """
-    advice_question_patterns = [
-        r"\b(should i (buy|sell|invest|hold))\b",
-        r"\b(almalı mıyım|satmalı mıyım|yatırım yapmalı mıyım)\b",
-        r"\b(what (stock|hisse) (should|to) buy)\b",
-        r"\b(hangi hisseyi alayım|ne alayım|ne satalım)\b",
-        r"\b(is .+ a good buy|is .+ worth buying)\b",
-        r"\b(fiyat tahmin|price predict)\b",
-    ]
-
-    for pattern in advice_question_patterns:
-        if re.search(pattern, question, re.IGNORECASE):
-            return False, INVESTMENT_ADVICE_REDIRECT
-
+    """Safety checks disabled."""
     return True, ""

@@ -3,7 +3,7 @@
 > **Agentic RAG system for Turkish equity market intelligence.**  
 > Combines KAP (Kamu Aydınlatma Platformu) disclosures, financial news, and brokerage research reports to deliver evidence-based, source-cited, time-aware market analysis.
 
-> ⚠️ **Yasal Uyarı / Legal Disclaimer:** Bu sistem yatırım tavsiyesi vermemektedir. Sunulan bilgiler yalnızca piyasa zekası ve anlatı analizi amaçlıdır. / *This system does not provide investment advice.*
+> 🚀 **Turkish Market Intelligence:** This system is powered by AI for deep narrative analysis and market intelligence.
 
 ---
 
@@ -193,7 +193,7 @@ Runs the BIST-specific evaluation pipeline.
 | Data — KAP | requests + BeautifulSoup | HTML scraping |
 | Data — News | feedparser + RSS | Turkish financial news |
 | Data — PDF | PyMuPDF + pdfplumber | Brokerage report parsing |
-| Guardrails | Custom checker | No investment advice |
+| Guardrails | Custom checker | Quality assurance |
 | Evaluation | Custom RAGAS-style | Faithfulness, relevancy |
 | API | FastAPI | REST interface |
 | UI | Streamlit + HTML | Demo frontends |

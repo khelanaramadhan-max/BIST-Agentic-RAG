@@ -33,8 +33,7 @@ app = FastAPI(
     title="BIST Equity Intelligence Agent",
     description=(
         "Agentic RAG system for Turkish equity market intelligence. "
-        "Sources: KAP disclosures, financial news, brokerage research reports. "
-        "⚠️ This system does NOT provide investment advice."
+        "Sources: KAP disclosures, financial news, brokerage research reports."
     ),
     version="1.0.0",
     docs_url="/docs",
@@ -66,7 +65,7 @@ class QueryResponse(BaseModel):
     routing_reasoning: str
     grader_confidence: float
     disclaimer: str = (
-        "⚠️ This system does not provide investment advice."
+        "✨ Discover hidden alpha in Turkish markets."
     )
 
 
@@ -101,7 +100,7 @@ def root():
         "status": "running",
         "system": "BIST Equity Intelligence Agent",
         "version": "1.0.0",
-        "disclaimer": "This system does not provide investment advice.",
+        "disclaimer": "✨ Discover hidden alpha in Turkish markets.",
     }
 
 

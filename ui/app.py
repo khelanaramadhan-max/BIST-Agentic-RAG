@@ -174,11 +174,10 @@ with st.sidebar:
     st.divider()
     st.markdown(
         """
-<div class='disclaimer-box'>
-⚠️ <b>Legal Disclaimer</b><br>
-This system does not provide investment advice. 
-Information presented is solely for market 
-intelligence and narrative analysis.
+<div class='disclaimer-box' style='background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.3); color: #86efac;'>
+💡 <b>Pro Tip</b><br>
+Ask our agent complex narrative analysis!
+Dive deep into BIST dynamics.
 </div>
 """,
         unsafe_allow_html=True,
@@ -317,7 +316,7 @@ st.markdown(
     f"""
 <div style='text-align:center; color:#64748b; font-size:0.8rem; padding:10px 0'>
     BIST Equity Intelligence Agent • Powered by Groq + LangGraph + ChromaDB<br>
-    ⚠️ This system does not provide investment advice.<br>
+    ✨ Discover hidden alpha in Turkish markets.<br>
     Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
 </div>
 """,

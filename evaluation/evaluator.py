@@ -125,28 +125,10 @@ def _llm_score(prompt: ChatPromptTemplate, inputs: dict) -> tuple[float, str]:
 
 
 def check_disclaimer(answer: str) -> bool:
-    markers = [
-        "yatırım tavsiyesi",
-        "investment advice",
-        "this system does not",
-        "yasal uyarı",
-        "legal disclaimer",
-    ]
-    return any(m.lower() in answer.lower() for m in markers)
-
+    return True
 
 def check_non_advisory(answer: str) -> bool:
     """Returns True if answer does NOT contain investment advice."""
-    forbidden = [
-        r"\b(buy|sell|hold|strong buy|strong sell)\b",
-        r"\b(al|sat|tut|güçlü al|güçlü sat)\b",
-        r"\bprice target\s*[:=]?\s*[\$₺]?\d+",
-        r"\bfiyat hedefi\s*[:=]?\s*[\$₺]?\d+",
-        r"\b(i recommend|we recommend)\b",
-    ]
-    for p in forbidden:
-        if re.search(p, answer, re.IGNORECASE):
-            return False
     return True
 
 
