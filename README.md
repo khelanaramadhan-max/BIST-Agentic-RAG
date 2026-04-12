@@ -59,8 +59,12 @@ docker-compose up -d --build
 - **Docs/Swagger**: Explore the `/query` endpoints at `http://localhost:8000/docs`.
 
 ### Deploying the HTML Frontend
-This repository is configured to automatically deploy a stunning, decoupled HTML interface directly to **GitHub Pages**! 
-Just push to the `main` branch, and the Action workflow will compile the `ui` folder online so you can share it globally.
+This repository deploys the chat UI from the `ui` folder via **GitHub Actions** (workflow *Deploy UI to GitHub Pages*).
+
+1. In the repo go to **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions** (not “Deploy from a branch”). Otherwise GitHub may show the **README** instead of the app.
+2. Push to `main`; the workflow publishes the UI at your Pages URL (the interactive chat loads at the site root).
+
+If you must use **Deploy from branch** with the repository root, open **`/ui/index.html`**, or use the root **`index.html`** in this repo (it redirects to `ui/index.html`).
 
 ---
 
