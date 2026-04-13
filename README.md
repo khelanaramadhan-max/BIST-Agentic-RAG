@@ -46,23 +46,61 @@ The system is strictly governed by a non-advisory alignment layer. By design, it
 The intelligence agent operates via a self-correcting state machine implemented in **LangGraph**. The underlying processing pipeline follows the architecture flow below:
 
 ```mermaid
-graph TD
-    A[User Query] --> B{Source Router Agent}
-    B -->|Priority 1| C[KAP DB / API]
-    B -->|Priority 2| D[News DB]
-    B -->|Priority 3| R[Brokerage Reports]
-    B -->|Fallback| W[Live Web Search]
-    C --> E[Vector Retrieval]
-    D --> E
-    R --> E
-    W --> E
-    E --> F[Cross-Source Verifier & Context Grader]
-    F -->|Inconsistent / Gaps| G[Query Rewriter & Re-Retrieve]
-    G --> E
-    F -->|Verified Reality| H[Response Composer]
-    H --> I{Financial Guardrails}
-    I -->|Advice Detected| J[Block & Disclaimer]
-    I -->|Safe Market Intel| K[Generate Cited Answer + Disclaimer]
+flowchart TB
+    %% Core Inputs/Outputs
+    Client(((User Request)))
+    SafeOutput(((Verified Market Intelligence)))
+    BlockedOutput(((Compliance Block + Disclaimer)))
+
+    subgraph LangGraph_Engine [Agentic State Machine]
+        direction TB
+        CognitiveRouter{Cognitive Router}
+        
+        subgraph Data_Streams [Retrieval Channels]
+            KAP_DB[(KAP Semantic Index)]
+            News_Feed[(Financial News DB)]
+            PDF_Vault[(Brokerage Reports)]
+            Web_Search[(Internet Search Node)]
+        end
+        
+        RelevanceEvaluator{Relevance & Consistency Grader}
+        SelfCorrection[Self-Correction / Rewriter]
+        ReportGenerator(Final Report Synthesis)
+        ComplianceLayer{Ethical Alignment Filter}
+    end
+
+    %% Flow Dynamics
+    Client --> CognitiveRouter
+    
+    CognitiveRouter -->|Official Filings| KAP_DB
+    CognitiveRouter -->|Market Sentiment| News_Feed
+    CognitiveRouter -->|Analyst Research| PDF_Vault
+    CognitiveRouter -->|Live Fallback| Web_Search
+    
+    KAP_DB --> RelevanceEvaluator
+    News_Feed --> RelevanceEvaluator
+    PDF_Vault --> RelevanceEvaluator
+    Web_Search --> RelevanceEvaluator
+    
+    RelevanceEvaluator -->|Data Gap Detected| SelfCorrection
+    SelfCorrection -. "Re-Query" .-> CognitiveRouter
+    
+    RelevanceEvaluator -->|Context Validated| ReportGenerator
+    ReportGenerator --> ComplianceLayer
+    
+    ComplianceLayer -->|Passes Policy Check| SafeOutput
+    ComplianceLayer -->|Advice Flagged| BlockedOutput
+    
+    %% Diagram Styling
+    classDef input fill:#2563eb,stroke:#1e40af,stroke-width:2px,color:#fff
+    classDef output fill:#16a34a,stroke:#15803d,stroke-width:2px,color:#fff
+    classDef blocked fill:#dc2626,stroke:#991b1b,stroke-width:2px,color:#fff
+    classDef storage fill:#374151,stroke:#9ca3af,stroke-width:1px,color:#fff
+    
+    class Client input
+    class SafeOutput output
+    class BlockedOutput blocked
+    class KAP_DB,News_Feed,PDF_Vault,Web_Search storage
 ```
 
 The full process runs as follows:
