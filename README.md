@@ -43,7 +43,29 @@ The system is strictly governed by a non-advisory alignment layer. By design, it
 ---
 
 ## 3. Agentic RAG Architecture & Process Pipeline
-The intelligence agent operates via a self-correcting state machine implemented in **LangGraph**. The full process runs as follows:
+The intelligence agent operates via a self-correcting state machine implemented in **LangGraph**. The underlying processing pipeline follows the architecture flow below:
+
+```mermaid
+graph TD
+    A[User Query] --> B{Source Router Agent}
+    B -->|Priority 1| C[KAP DB / API]
+    B -->|Priority 2| D[News DB]
+    B -->|Priority 3| R[Brokerage Reports]
+    B -->|Fallback| W[Live Web Search]
+    C --> E[Vector Retrieval]
+    D --> E
+    R --> E
+    W --> E
+    E --> F[Cross-Source Verifier & Context Grader]
+    F -->|Inconsistent / Gaps| G[Query Rewriter & Re-Retrieve]
+    G --> E
+    F -->|Verified Reality| H[Response Composer]
+    H --> I{Financial Guardrails}
+    I -->|Advice Detected| J[Block & Disclaimer]
+    I -->|Safe Market Intel| K[Generate Cited Answer + Disclaimer]
+```
+
+The full process runs as follows:
 
 1. **User Query Intake**: The user submits a question through the responsive UI.
 2. **Source Router**: The LLM evaluates the query to dynamically formulate a strategy—deciding whether to query KAP, News, Brokerage reports, or Live Web search.
