@@ -1,6 +1,6 @@
-# 📊 BIST Equity Intelligence Agent
+# BIST Equity Intelligence Agent
 
-## 🚀 Live  & Project Links
+ Live  & Project Links
 - **Live Site**: [BIST Agentic RAG on Render](https://bist-agentic-rag-1.onrender.com) *(Update with your live URL if different)*
 - **Front End**: Built with Vanilla HTML/CSS/JS. Features a highly responsive UI, glowing micro-animations, glassmorphism, and live simulated market ticker integrations.
 - **Back End**: Python-based FastAPI server, handling RAG orchestration and LangGraph agent logic. Deployed via **Render**.
