@@ -1763,9 +1763,9 @@
 
         function fallbackBasesForFetch() {
             const list = [];
-            if (normalizeApiBase(API_BASE) && !apiBaseIsThisDocumentSite(API_BASE)) list.push(API_BASE);
+            if (normalizeApiBase(API_BASE)) list.push(API_BASE);
             if (!pageIsHttps()) list.push('http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:8000', 'http://localhost:8000');
-            if (!pageIsFile() && !pageIsHttps()) list.push(location.origin);
+            if (!pageIsFile()) list.push(location.origin);
             return uniqueBases(list);
         }
 
@@ -1805,17 +1805,17 @@
             if (fromQuery) candidates.push(normalizeApiBase(fromQuery));
             if (fromMeta) candidates.push(normalizeApiBase(fromMeta));
             if (saved) candidates.push(normalizeApiBase(saved));
+            // Always try location.origin first — Railway serves both UI and API from same domain
+            if (!pageIsFile()) candidates.push(location.origin);
             if (!pageIsHttps()) candidates.push('http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:8000', 'http://localhost:8000');
-            if (!pageIsHttps() && !pageIsFile()) candidates.push(location.origin);
 
             const seen = new Set();
             for (const c of candidates) {
                 if (!c || seen.has(c)) continue;
-                if (pageIsHttps() && apiBaseIsThisDocumentSite(c)) continue;
                 seen.add(c);
                 if (await probeHealth(c)) return c;
             }
-            if (pageIsHttps()) return '';
+            if (pageIsHttps()) return location.origin;
             return 'http://127.0.0.1:8080';
         }
 
@@ -1893,10 +1893,6 @@
             if (!input) return;
             const next = normalizeApiBase(input.value);
             if (!next) return;
-            if (pageIsHttps() && apiBaseIsThisDocumentSite(next)) {
-                alert('That URL is this static website. Paste the URL of your FastAPI server (HTTPS), not the GitHub Pages address.');
-                return;
-            }
             API_BASE = next;
             try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
             refreshApiUi();
@@ -1905,7 +1901,7 @@
                 document.getElementById('api-editor').style.display = 'none';
                 loadStats();
             } else {
-                alert('Could not reach /health on that URL. Check the address and that uvicorn is running.');
+                alert('Could not reach /health on that URL. Check the address and that the server is running.');
             }
         });
 
@@ -1913,15 +1909,7 @@
             // Init market data immediately (no API needed)
             initMarket();
 
-            try {
-                const prev = localStorage.getItem('BIST_API_BASE');
-                if (pageIsHttps() && prev && apiBaseIsThisDocumentSite(prev)) {
-                    localStorage.removeItem('BIST_API_BASE');
-                }
-            } catch (_) { }
-
             API_BASE = await discoverApiBase();
-            if (pageIsHttps() && apiBaseIsThisDocumentSite(API_BASE)) API_BASE = '';
 
             if (normalizeApiBase(API_BASE) && await probeHealth(API_BASE)) {
                 try { localStorage.setItem('BIST_API_BASE', API_BASE); } catch (_) { }
