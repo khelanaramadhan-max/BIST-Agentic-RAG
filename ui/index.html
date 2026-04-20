@@ -1629,15 +1629,34 @@
             }).join('');
         }
 
+        async function fetchLiveNews() {
+            try {
+                if(!API_BASE) return;
+                const b = normalizeApiBase(API_BASE);
+                const res = await fetch(`${b}/api/live_news?ticker=BIST&max_num=8`, { method: 'GET' });
+                if(res.ok) {
+                    const data = await res.json();
+                    if(data.news && data.news.length > 0) {
+                        buildNewsFeed(data.news);
+                    }
+                }
+            } catch(e) {
+                console.warn('Could not fetch live news', e);
+            }
+        }
+
         function buildNewsFeed(news) {
             const el = document.getElementById('news-feed');
             if (!el) return;
-            el.innerHTML = news.map(n => `
-                <div class="news-item" onclick="setQuestion('${n.headline.replace(/'/g, "\\'")}')">
+            el.innerHTML = news.map(n => {
+                const clickTarget = n.url && n.url !== '#' ? n.url : 'javascript:void(0)';
+                return `
+                <div class="news-item" onclick="window.open('${clickTarget}', '_blank')" style="cursor: pointer;">
                     <div class="news-ticker-tag">${n.ticker}</div>
-                    <div class="news-headline">${n.headline}</div>
-                    <div class="news-time">🕐 ${n.time}</div>
-                </div>`).join('');
+                    <div class="news-headline" style="color: #93c5fd; text-decoration: none;">${n.headline}</div>
+                    <div class="news-time">🕐 ${n.time} ${n.institution ? '— ' + n.institution : ''}</div>
+                </div>`;
+            }).join('');
         }
 
         function buildSparkline(heights) {
@@ -1728,12 +1747,15 @@
             buildTickerTape(BIST_STOCKS);
             buildStocksList(BIST_STOCKS);
             buildSparkline(SPARKLINE_HEIGHTS);
-            buildNewsFeed(SAMPLE_NEWS);
+            buildNewsFeed(SAMPLE_NEWS); // Initial mock data while loading
+            setTimeout(fetchLiveNews, 2000); // Fetch live news shortly after load
             updateIndexDisplay(BIST_STOCKS);
             updateMarketSummary();
 
             // Update market data every 20 seconds
             setInterval(refreshMarketData, 20000);
+            // Update live news every 2 minutes
+            setInterval(fetchLiveNews, 120000);
         }
 
         function askAbout(ticker) {

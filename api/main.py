@@ -125,6 +125,28 @@ def stats():
         raise HTTPException(status_code=500, detail=str(exc))
 
 
+@app.get("/api/live_news", summary="Get live BIST market news")
+def live_news(ticker: str = "BIST 100", max_num: int = 8):
+    try:
+        from ingestion.news_fetcher import fetch_news_for_ticker
+        articles = fetch_news_for_ticker(ticker, days_back=3, max_articles=max_num)
+        
+        # Format for UI
+        formatted_news = []
+        for art in articles:
+            # Map title to headline, date to time
+            formatted_news.append({
+                "ticker": art.get("ticker", "MACRO"),
+                "headline": art.get("title", ""),
+                "time": art.get("date", ""),
+                "url": art.get("url", "#"),
+                "institution": art.get("institution", "")
+            })
+        return {"news": formatted_news}
+    except Exception as exc:
+        logger.error("Error fetching live news: %s", exc)
+        raise HTTPException(status_code=500, detail=str(exc))
+
 @app.post("/query", response_model=QueryResponse, summary="Ask the BIST Intelligence Agent")
 @app.post("/api/query", response_model=QueryResponse, include_in_schema=False)
 def query(req: QueryRequest):
