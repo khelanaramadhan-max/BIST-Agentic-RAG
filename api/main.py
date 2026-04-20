@@ -115,6 +115,15 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/admin", summary="Integration Hub Dashboard")
+def admin_dashboard():
+    """Serves the static admin/connectors dashboard HTML."""
+    admin_path = REPO_ROOT / "ui" / "admin.html"
+    if admin_path.is_file():
+        return FileResponse(admin_path)
+    raise HTTPException(status_code=404, detail="Admin UI not found")
+
+
 @app.get("/stats", response_model=StatsResponse, summary="Vector DB collection statistics")
 @app.get("/api/stats", response_model=StatsResponse, include_in_schema=False)
 def stats():
