@@ -82,13 +82,21 @@ def fetch_news_for_ticker(
             search_terms.append(first_word)
 
     cutoff = datetime.now() - timedelta(days=days_back)
-    articles: list[dict] = []
+    articles_by_feed = []
 
     for feed_info in RSS_FEEDS:
         feed_articles = _parse_rss_feed(feed_info, search_terms, cutoff)
-        articles.extend(feed_articles)
-        if len(articles) >= max_articles:
-            break
+        if feed_articles:
+            articles_by_feed.append(feed_articles)
+            
+    # Round-robin selection for variety
+    articles: list[dict] = []
+    while articles_by_feed and len(articles) < max_articles * 2: # Keep some buffer for deduplication
+        for feed_list in list(articles_by_feed):
+            if feed_list:
+                articles.append(feed_list.pop(0))
+            else:
+                articles_by_feed.remove(feed_list)
 
     # De-duplicate by title
     seen_titles: set[str] = set()
