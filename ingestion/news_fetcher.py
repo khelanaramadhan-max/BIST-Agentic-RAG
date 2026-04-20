@@ -70,8 +70,12 @@ def fetch_news_for_ticker(
     Returns normalised document dicts.
     """
     logger.info("Fetching news for %s ...", ticker)
-    search_terms = [ticker.upper()]
-    if company_name:
+    
+    # If general market query, don't filter aggressively
+    is_general = ticker.upper() in ("BIST", "MACRO", "BIST 100", "GLOBAL")
+    search_terms = [] if is_general else [ticker.upper()]
+    
+    if company_name and not is_general:
         # Use first meaningful word from company name
         first_word = company_name.split()[0] if company_name else ""
         if first_word and first_word not in search_terms:
@@ -119,7 +123,7 @@ def _parse_rss_feed(
             summary = entry.get("summary", entry.get("description", ""))
             text = (title + " " + summary).upper()
 
-            if not any(term.upper() in text for term in search_terms):
+            if search_terms and not any(term.upper() in text for term in search_terms):
                 continue
 
             pub_date = _parse_date(entry)
@@ -204,45 +208,92 @@ def _generate_sample_news(ticker: str, company_name: str = "") -> list[dict]:
             "ticker": ticker,
             "source_type": "news",
             "institution": "Bloomberg HT [SAMPLE]",
-            "date": (now - timedelta(days=3)).strftime("%Y-%m-%d"),
+            "date": (now - timedelta(days=1)).strftime("%Y-%m-%d"),
             "title": f"{ticker}: Analistler güçlü çeyrek beklentisi koruyor",
-            "content": (
-                f"{name}, son dönemde yurt içi tüketim talebindeki artış ve ihracat gelirlerindeki "
-                f"iyileşme sayesinde olumlu finansal görünümünü sürdürmektedir. "
-                f"Sektör analistleri, şirketin yıl sonu performansına ilişkin beklentilerini "
-                f"korurken maliyet baskıları ve kur riskine dikkat çekmektedir. "
-                f"[SAMPLE – canlı haber verisi çekilemedi]"
-            ),
+            "content": f"{name}, son dönemde yurt içi tüketim talebindeki artış ve ihracat gelirlerindeki iyileşme sayesinde olumlu finansal görünümünü sürdürmektedir.",
             "url": "https://www.bloomberght.com/",
         },
         {
             "ticker": ticker,
             "source_type": "news",
             "institution": "Dünya Gazetesi [SAMPLE]",
-            "date": (now - timedelta(days=7)).strftime("%Y-%m-%d"),
+            "date": (now - timedelta(days=2)).strftime("%Y-%m-%d"),
             "title": f"{ticker} sektöründe dönüşüm hızlanıyor",
-            "content": (
-                f"Türkiye'nin önde gelen şirketlerinden {name}, dijital dönüşüm yatırımlarına "
-                f"hız verdiğini açıkladı. Şirket yönetimi, operasyonel verimliliği artırmaya "
-                f"yönelik teknolojik altyapı güncellemelerini sürdürdüğünü belirtti. "
-                f"[SAMPLE – canlı haber verisi çekilemedi]"
-            ),
+            "content": f"Türkiye'nin önde gelen şirketlerinden {name}, dijital dönüşüm yatırımlarına hız verdiğini açıkladı.",
             "url": "https://www.dunya.com/",
         },
         {
             "ticker": ticker,
             "source_type": "news",
             "institution": "Para Analiz [SAMPLE]",
-            "date": (now - timedelta(days=14)).strftime("%Y-%m-%d"),
+            "date": (now - timedelta(days=3)).strftime("%Y-%m-%d"),
             "title": f"BIST'te {ticker} izleme listesinde",
-            "content": (
-                f"Borsa İstanbul'da {ticker} hissesi, son haftalarda yoğun işlem hacmiyle "
-                f"dikkat çekmektedir. Piyasa katılımcıları, şirketin yaklaşan genel kurul "
-                f"toplantısı öncesinde açıklanacak finansal verileri yakından takip etmektedir. "
-                f"[SAMPLE – canlı haber verisi çekilemedi]"
-            ),
+            "content": f"Borsa İstanbul'da {ticker} hissesi, son haftalarda yoğun işlem hacmiyle dikkat çekmektedir.",
             "url": "https://www.paraanaliz.com/",
         },
+        {
+            "ticker": "MACRO",
+            "source_type": "news",
+            "institution": "Ekonomim [SAMPLE]",
+            "date": (now - timedelta(days=1)).strftime("%Y-%m-%d"),
+            "title": "TCMB faiz kararı öncesi piyasalarda beklenti anketi sonuçlandı",
+            "content": "Merkez Bankası'nın faiz kararı piyasalar tarafından dikkatle bekleniyor.",
+            "url": "https://www.ekonomim.com/",
+        },
+        {
+            "ticker": "GLOBAL",
+            "source_type": "news",
+            "institution": "Bloomberg HT [SAMPLE]",
+            "date": (now - timedelta(hours=5)).strftime("%Y-%m-%d"),
+            "title": "FED tutanakları enflasyon endişelerinin sürdüğüne işaret ediyor",
+            "content": "FED yetkilileri enflasyonla mücadelede henüz erken zafer ilan edilmemesi gerektiğini düşünüyor.",
+            "url": "https://www.bloomberght.com/",
+        },
+        {
+            "ticker": ticker,
+            "source_type": "news",
+            "institution": "Finans Gündem [SAMPLE]",
+            "date": (now - timedelta(hours=14)).strftime("%Y-%m-%d"),
+            "title": f"{ticker} hisselerinde yabancı ilgisi artıyor",
+            "content": "Yabancı yatırımcıların Borsa İstanbul'a yönelik ilgisi son raporlara da yansıdı.",
+            "url": "https://www.finansgundem.com/",
+        },
+        {
+            "ticker": "BTC-USD",
+            "source_type": "news",
+            "institution": "CoinDesk TR [SAMPLE]",
+            "date": (now - timedelta(hours=2)).strftime("%Y-%m-%d"),
+            "title": "Bitcoin dalgalı seyrine devam ederken kripto ETF'lere girişler artıyor",
+            "content": "Kripto piyasalarında Bitcoin ETF'lerine yönelik kurumsal ilginin artmasıyla fiyatlarda dalgalı seyir devam ediyor.",
+            "url": "https://tr.investing.com/crypto/bitcoin/news",
+        },
+        {
+            "ticker": ticker,
+            "source_type": "news",
+            "institution": "Dünya Gazetesi [SAMPLE]",
+            "date": (now - timedelta(hours=6)).strftime("%Y-%m-%d"),
+            "title": f"{ticker} için yeni hedef fiyat açıklandı",
+            "content": "Aracı kurumlar son finansallar sonrası şirket için hedef fiyatı yukarı yönlü revize etti.",
+            "url": "https://www.dunya.com/",
+        },
+        {
+            "ticker": "MACRO",
+            "source_type": "news",
+            "institution": "Bloomberg HT [SAMPLE]",
+            "date": (now - timedelta(days=4)).strftime("%Y-%m-%d"),
+            "title": "İhracat rakamlarında rekor beklentisi yetkililerce doğrulandı",
+            "content": "Yılın son çeyreğinde ihracat artışının sürmesi bekleniyor.",
+            "url": "https://www.bloomberght.com/",
+        },
+        {
+            "ticker": "GLOBAL",
+            "source_type": "news",
+            "institution": "Para Analiz [SAMPLE]",
+            "date": (now - timedelta(days=2)).strftime("%Y-%m-%d"),
+            "title": "Altın fiyatlarında jeopolitik risklerin etkisiyle tarihi zirve test edildi",
+            "content": "Uluslararası piyasalarda ons altın, küresel gerilimlerin artmasıyla yönünü yukarı çevirdi.",
+            "url": "https://www.paraanaliz.com/",
+        }
     ]
 
 

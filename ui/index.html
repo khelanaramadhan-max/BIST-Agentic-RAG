@@ -1492,8 +1492,8 @@
                         <div class="summary-chip-value up" id="macro-gold">$2,345.10</div>
                     </div>
                     <div class="summary-chip">
-                        <div class="summary-chip-label">Brent Crude</div>
-                        <div class="summary-chip-value down" id="macro-brent">$83.40</div>
+                        <div class="summary-chip-label">Bitcoin</div>
+                        <div class="summary-chip-value up" id="macro-btc">$68,400</div>
                     </div>
                 </div>
             </div>
@@ -1633,7 +1633,7 @@
             try {
                 if(!API_BASE) return;
                 const b = normalizeApiBase(API_BASE);
-                const res = await fetch(`${b}/api/live_news?ticker=BIST&max_num=8`, { method: 'GET' });
+                const res = await fetch(`${b}/api/live_news?ticker=BIST&max_num=10`, { method: 'GET' });
                 if(res.ok) {
                     const data = await res.json();
                     if(data.news && data.news.length > 0) {
@@ -1715,7 +1715,7 @@
             if (el('macro-usd')) el('macro-usd').textContent = (34.2150 + (Math.random() - 0.5) * 0.05).toFixed(4);
             if (el('macro-eur')) el('macro-eur').textContent = (36.5412 + (Math.random() - 0.5) * 0.05).toFixed(4);
             if (el('macro-gold')) el('macro-gold').textContent = '$' + (2345.10 + (Math.random() - 0.5) * 5).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            if (el('macro-brent')) el('macro-brent').textContent = '$' + (83.40 + (Math.random() - 0.5) * 1).toFixed(2);
+            if (el('macro-btc')) el('macro-btc').textContent = '$' + (68400 + (Math.random() - 0.5) * 500).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
         function refreshMarketData() {
