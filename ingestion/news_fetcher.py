@@ -72,7 +72,7 @@ def fetch_news_for_ticker(
     logger.info("Fetching news for %s ...", ticker)
     
     # If general market query, don't filter aggressively
-    is_general = ticker.upper() in ("BIST", "MACRO", "BIST 100", "GLOBAL")
+    is_general = ticker.upper() in ("BIST", "MACRO", "BIST 100", "BIST 50", "BIST 30", "XBANK", "GLOBAL")
     search_terms = [] if is_general else [ticker.upper()]
     
     if company_name and not is_general:

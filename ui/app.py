@@ -119,8 +119,11 @@ with st.sidebar:
     st.markdown("## ⚙️ Configuration")
 
     ticker_options = [
-        "ASELS", "GARAN", "AKBNK", "THYAO", "BIMAS",
-        "EREGL", "KCHOL", "TUPRS", "SISE", "PGSUS",
+        "BIST 100", "BIST 50", "BIST 30", "XBANK",   # Global Indices
+        "ASELS", "GARAN", "AKBNK", "ISCTR", "YKBNK", # Tech & Banks
+        "HALKB", "THYAO", "BIMAS", "EREGL", "KCHOL", # Key Holdings
+        "TUPRS", "SISE",  "PGSUS", "SAHOL", "ENKAI", 
+        "FROTO", "TTKOM", "TCELL", "VAKBN"           # Mega Caps
     ]
     selected_ticker = st.selectbox(
         "📌 Select Ticker",
