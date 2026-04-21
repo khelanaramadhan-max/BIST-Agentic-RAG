@@ -38,7 +38,13 @@ BIST_TICKERS = [
     # Industrials/Conglomerates/Tech (BIST 30/50 proxies)
     "THYAO", "BIMAS", "KCHOL", "EREGL", "ASELS", "TUPRS", "SAHOL", "SISE", 
     "ENKAI", "PETKM", "FROTO", "PGSUS", "TOASO", "TCELL", "TTKOM", "KRDMD", 
-    "SASA", "HEKTS", "KORDS", "MGROS", "SELEC", "DOAS", "TAVHL"
+    "SASA", "HEKTS", "KORDS", "MGROS", "SELEC", "DOAS", "TAVHL",
+    # Additional BIST Market Stocks
+    "AKSA", "ALARK", "ARCLK", "ASTOR", "BRSAN", "CCOLA", "CIMSA", "CWENE", 
+    "DOHOL", "ECILC", "EGEEN", "EKGYO", "ENJSA", "EUPWR", "GESAN", "GUBRF", 
+    "GWIND", "IPEKE", "ISGYO", "KLRHO", "KLSER", "KONTR", "KOZAA", "KOZAL", 
+    "MAVI", "MIATK", "ODAS", "OYAKC", "PENTA", "SMRTG", "SOKM", "TKFEN", 
+    "VESBE", "VESTL", "YYLGD"
 ]
 
 def generate_mock_broker_pdfs():
@@ -52,30 +58,27 @@ def generate_mock_broker_pdfs():
 
     today = datetime.now().strftime("%Y-%m-%d")
     
-    reports = [
-        {"ticker": "AKBNK", "broker": "IsYatirim", "text": "AKBNK maintains a strong NIM despite regulatory pressure. Buy rating retained. Price target 75 TRY."},
-        {"ticker": "GARAN", "broker": "YapiKredi", "text": "GARAN Q2 results exceed expectations. Consumer loan growth is robust. Outperform. Price target 180 TRY."},
-        {"ticker": "ISCTR", "broker": "GarantiBBVA", "text": "ISCTR shows excellent asset quality and conservative provisioning. Hold. Target 18 TRY."},
-        {"ticker": "THYAO", "broker": "AkYatirim", "text": "THYAO passenger loads are record high. Yields improved by 15% YoY. Overweight. Target 400 TRY."},
-        {"ticker": "BIMAS", "broker": "Tera", "text": "BIMAS traffic growth is offsetting inflation. Margins stabilized in Q3. Buy rating. Target 550 TRY."},
-        {"ticker": "EREGL", "broker": "ZiraatYatirim", "text": "EREGL steel margins remain under pressure globally, but local demand provides a floor. Hold. Target 50 TRY."},
-        {"ticker": "ASELS", "broker": "Gedik", "text": "ASELS robust backlog of USD 11B secures revenue visibility for the next 3 years. Strong Buy."},
-        {"ticker": "TUPRS", "broker": "VakifYatirim", "text": "TUPRS crack spreads are narrowing but remain historically high. Hold rating maintained."},
-    ]
+    brokers = ["IsYatirim", "YapiKredi", "GarantiBBVA", "AkYatirim", "Tera", "ZiraatYatirim", "Gedik", "VakifYatirim"]
+    import random
 
-    for rep in reports:
-        filename = f"{rep['ticker']}_{rep['broker']}_Initiation_{today}.pdf"
+    for ticker in BIST_TICKERS:
+        broker = random.choice(brokers)
+        target_price = round(random.uniform(10, 500), 2)
+        rating = random.choice(["Buy", "Hold", "Outperform", "Strong Buy", "Overweight"])
+        text = f"{ticker} shows resilience in the current macroeconomic environment. Margins have stabilized leading to steady cash flows. {rating} rating initiated with a target price of {target_price} TRY."
+        
+        filename = f"{ticker}_{broker}_Initiation_{today}.pdf"
         filepath = pdf_dir / filename
         
         c = canvas.Canvas(str(filepath), pagesize=letter)
         c.setFont("Helvetica-Bold", 16)
-        c.drawString(72, 700, f"{rep['broker']} - Equity Research: {rep['ticker']}")
+        c.drawString(72, 700, f"{broker} - Equity Research: {ticker}")
         
         c.setFont("Helvetica", 12)
         c.drawString(72, 670, f"Date: {today}")
         
         # Split text into lines just in case
-        lines = rep['text'].split(". ")
+        lines = text.split(". ")
         y = 620
         for line in lines:
             c.drawString(72, y, line + ("." if not line.endswith(".") else ""))
